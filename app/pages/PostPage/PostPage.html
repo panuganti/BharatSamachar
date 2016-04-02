@@ -1,0 +1,90 @@
+<ion-navbar *navbar class="show-navbar">
+</ion-navbar>
+
+<ion-content class="has-header components-demo cards-bg social-cards postpage" 
+                    [style.background]="backgroundImageUrl" >
+    <ion-list>
+        <div [hidden]="state!='NoPreview'">
+            <ion-item [hidden]="postSource!=null">
+                <ion-label>Select Source</ion-label>
+                <ion-select [(ngModel)]="postSource">
+                    <ion-option value="url">Url</ion-option>
+                    <ion-option value="feeds">Feeds</ion-option>
+                </ion-select>
+            </ion-item>
+            <ion-item [hidden]="!(postSource=='feeds')">
+                <ion-label>Feed Language</ion-label>
+                <ion-select [(ngModel)]="feedStream">
+                    <ion-option value="english">English</ion-option>
+                    <ion-option value="hindi">Hindi</ion-option>
+                    <ion-option value="marathi">Marathi</ion-option>
+                    <ion-option value="telugu">Telugu</ion-option>
+                </ion-select>
+            </ion-item>
+            <ion-item [hidden]="!(postSource=='url')">
+                <ion-label floating>Paste an Url here ...</ion-label>
+                <ion-input type="text" [(ngModel)]="url" required></ion-input>
+            </ion-item>
+            <ion-item [hidden]="postSource==null">
+                <button (click)="loadArticle()"> Fetch </button>
+            </ion-item>
+        </div>
+    </ion-list>
+    <ion-card *ngIf="postPreview!=undefined && state == 'Preview'">
+        <ion-slides [options]="options">
+            <ion-slide *ngFor="#image of postPreview.Images; #i = index">
+                <img [hidden]="!toggleImage" src="{{imageUrl}}" (click)="editImageUrl()">
+                <br>
+                <ion-input *ngIf="!toggleImage" placeholder="Image Url" (change)="editImageUrl()" type=text [(ngModel)]="imageUrl"> 
+                    </ion-input>
+            </ion-slide>
+        </ion-slides>
+        <ion-card-content>
+            <h2> <b [hidden]="toggleHeadingEditing" (click)="editHeading()">{{postPreview.Heading}}</b>  
+                 <b> <ion-input *ngIf="toggleHeadingEditing" type="text" [(ngModel)]="postPreview.Heading">
+                     </ion-input> </b>
+            </h2>
+            <br>
+            <p [hidden]="toggleSnippetEditing" align="justify" (click)="editSnippet()">{{postPreview.Snippet}} </p>
+            <ion-input placeholder="Write snippet here.." *ngIf="toggleSnippetEditing" type="text" [(ngModel)]="postPreview.Snippet">
+            {{postPreview.Snippet}}
+            </ion-input>
+        </ion-card-content>
+        <ion-row>
+            <ion-item>
+                <ion-label>Stream(s)</ion-label>
+                <ion-select [(ngModel)]="streams" multiple="true">
+                    <ion-option value="politics">Politics</ion-option>
+                    <ion-option value="entertainment">Entertainment</ion-option>
+                    <ion-option value="sports">Sports</ion-option>
+                    <ion-option value="other">Other</ion-option>
+                </ion-select>
+            </ion-item>
+        </ion-row>
+        <ion-row>
+            <ion-input placeholder="Image Tags.." type=text [(ngModel)]="tags" required> </ion-input>
+        </ion-row>
+        <ion-item>
+            <ion-label>Language</ion-label>
+            <ion-select [(ngModel)]="language">
+                <ion-option value="english">English</ion-option>
+                <ion-option value="hindi">Hindi</ion-option>
+                <ion-option value="marathi">Marathi</ion-option>
+                <ion-option value="telugu">Telugu</ion-option>
+            </ion-select>
+        </ion-item>
+        <button (click)="publish()" full> Publish </button>
+    </ion-card>
+</ion-content>
+
+<style>
+    .social-cards ion-col {
+        padding: 0;
+    }
+    
+    .postpage {
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        background-position: 50% 50%;
+    }
+</style>

@@ -1,0 +1,22 @@
+<ion-navbar *navbar hideBackButton class="show-navbar">
+    <ion-buttons end>
+        <button (click)="saveAndGoBack()">
+            {{config.getLabel('done')}}
+        </button>
+    </ion-buttons>
+</ion-navbar>
+
+<ion-content>
+    Loading Contacts ...
+    <ion-list>
+        <ion-item *ngFor="#item of contacts; #i = index">
+            <ion-label>  
+    Display Name: {{item.displayName}} <br>
+    Name: {{item.name == null ? "null" : item.name.formatted}} <br>
+    PhoneNumber: {{item.phoneNumbers == null ? "null" : item.phoneNumbers[0].value}} <br>
+    Emails: {{item.emails == null ? "null" : item.emails[0].value}}; <br>
+    B'Day: {{item.birthday}} <br>                
+                </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>

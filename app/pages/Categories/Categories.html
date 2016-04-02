@@ -1,0 +1,34 @@
+<ion-navbar *navbar hideBackButton class="show-navbar">
+    <ion-title>
+        <center>{{categories}} </center>
+    </ion-title>
+    <ion-buttons end>
+        <button (click)="saveAndGoBack()">
+            {{done}}
+        </button>
+    </ion-buttons>
+</ion-navbar>
+
+<ion-content>
+    <div *ngFor="#item of config.categories; #i = index">
+        <ion-col>
+            <!-- width-50 style="float: left" -->
+            <ion-card class="category" [style.background]="item.backgroundImageUrl">
+                <ion-card-content>
+                    {{item.Text}}
+                    <ion-checkbox [(ngModel)]="item.UserSelected" right></ion-checkbox>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+    </div>
+</ion-content>
+
+<style> 
+    .category {
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50%;    
+    color: white;
+    }
+    
+</style>

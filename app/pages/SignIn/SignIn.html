@@ -6,14 +6,14 @@
 </video>
 
 <!-- Look for better solution than using a spacer -->
-<div class="spacer" style="width: auto; height: 50px;"></div>
+<div class="spacer" style="width: auto; height: 100px;"></div>
 <ion-list>
     <ion-item id="existingUser">
         <ion-label>I'm an Existing User</ion-label>
         <ion-checkbox [(ngModel)]="loginMode"></ion-checkbox>
     </ion-item>
 </ion-list>
-<div class="spacer" style="width: auto; height: 100px;"></div>
+<div class="spacer" style="width: auto; height: 50px;"></div>
 
 <div id="polina">
     <ion-list>
@@ -37,12 +37,10 @@
         <ion-row responsive-sm>
             <ion-col>
                 <button [hidden]="!loginMode" (click)="login()" primary block>{{enterLabel}}
-                    <ion-spinner name="ios"></ion-spinner>
                 </button>
             </ion-col>
             <ion-col>
                 <button [hidden]="loginMode" (click)="signup()" primary block>{{signupLabel}}
-                    <ion-spinner name="ios"></ion-spinner>
                 </button>
             </ion-col>
         </ion-row>

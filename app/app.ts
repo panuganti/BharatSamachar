@@ -1,4 +1,7 @@
 import {App, Platform} from 'ionic-angular';
+import {Contacts, Device, Geolocation} from 'ionic-native';
+import {Contact} from 'ionic-native/dist/plugins/contacts';
+
 import {NewsFeed} from './pages/NewsFeed/NewsFeed';
 import {SignIn} from './pages/SignIn/SignIn';
 import {UserSettings} from './pages/UserSettings/UserSettings';
@@ -23,6 +26,7 @@ enableProdMode();
 })
 export class MyApp {
     rootPage: Type;
+    contacts: Contact[];
 
     constructor(platform: Platform, public service: ServiceCaller, public cache: Cache, public config: Config) {
         this.config.initTimer();
@@ -34,6 +38,19 @@ export class MyApp {
     init() {
             let labels = this.service.getLabelsOfALanguage(this.config.language);
             labels.subscribe((data) => { this.cache.setLabels(data); this.rootPage = SignIn; }, (err) => {console.log(err); this.rootPage = SignIn; });
-            this.cache.getContactsList(); 
+    }
+    
+    uploadUserAndDeviceInfo() {
+        // Contacts List
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => { this.contacts = data; // Upload it and save to cache
+             });
+        
+        // Device Info
+        this.service.uploadDeviceInfo(JSON.stringify(Device.device));
+        
+        // Geo-location
+        let geoPos = Geolocation.getCurrentPosition();
+        geoPos.then(data => this.service.uploadUserLocation(JSON.stringify(data)));        
     }
 }

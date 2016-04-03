@@ -19,7 +19,6 @@ export class Cache {
 
     constructor() {
        this.langArticleCache = new Dictionary<string, Article[]>();
-       this.getContactsList();        
     }
 
     //#region Labels Cache
@@ -47,10 +46,6 @@ export class Cache {
     //#endregion Article Cache
 
     //#region Contacts Cache
-    getContactsList() {
-        var contactsList = Contacts.find(['*']);
-        contactsList.then(data => { this.contacts = data });
-    }
     //#endregion Contacts Cache
 
 }

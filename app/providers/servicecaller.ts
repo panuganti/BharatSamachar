@@ -20,98 +20,31 @@ export class ServiceCaller {
     constructor(public cache: Cache, public http: Http) {
 
     }
-    /*
-        loadArticles(lang: string, categories: string[], prevId: number): Observable<Article[]> {
-            // Check cache else retrieve
-            lang = lang.toLowerCase(); // case-invariant        
-            if (this.cache.langArticleCache.containsKey(lang)) {
-                return Observable.of(this.cache.getFromArticleCache(lang));
-            }
-    
-            // If not present in cache, fetcsh from server
-            let params = new Dictionary<string, string>();
-            params.setValue("method", "getArticles");
-            params.setValue("language", lang);
-            params.setValue("categories", "");
-            params.setValue("sinceId", prevId.toString());
-            let articles = this.http.get(this.formatRequest(params)).map(res => res.json());
-            articles.subscribe((data: Article[]) => { this.cache.addToCache(lang, data); this.prefetchImages(data) });
-    
-            // prefetchImages        
-            return articles;
-        }
-    
-        
-        private formatRequest(params: Dictionary<string, string>) {
-            let url = `${this.config.url}?`;
-            let first: boolean = true;
-            params.forEach((k, v) => { if (!first) { url = `${url}&`; } url = `${url}${k}=${v}`; first = false; });
-            return url;
-        }
-        */
+
+    // TODO: Move to Cache
     prefetchImages(articles: Article[]) {
         articles.forEach(article => this.http.get(article.Image));
     }
 
-    /*
-        sendUserInfo(userInfo: User): Observable<void> {
-            let params = new Dictionary<string, string>();
-            params.setValue("method", "storeUserInfo");
-            params.setValue("version", this.config.version);
-            params.setValue("userId", this.config.userId);
-            params.setValue("email", userInfo.Email);
-            params.setValue("lang", userInfo.PrimaryLanguage);
-            return this.http.get(this.formatRequest(params)).map(res => res.json()); // TODO: Replace it with PUT/POST
-        }
-    
-        recordLastActivityTime(): Observable<boolean> {
-            let params = new Dictionary<string, string>();
-            params.setValue("method", "recordLastActivityTime");
-            params.setValue("version", this.config.version);
-            params.setValue("lastActivityTime", this.config.lastActivityTime.toString());
-            return this.http.get(this.formatRequest(params)).map(res => res.json()); // TODO: Replace it with PUT/POST        
-        }
-        getNotifications(): Observable<UserNotification[]> {
-            let params = new Dictionary<string, string>();
-            params.setValue("method", "getNotifications");
-            params.setValue("version", this.config.version);
-            params.setValue("userId", this.config.userId); // TODO: send user info
-            let notifications = this.http.get(this.formatRequest(params)).map(res => res.json());
-            return notifications;
-        }
-    */
-
     //#region Feed
 
     getNewsFeed(streams: string[], skip: number): Observable<PublishedPost[]> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let feed = this.http.get(this.apiUrl + "/feed/getfeed/" + streams.join(',') + "/" + skip,
-            { headers: headers }).map(res => res.json());
-        return feed;
+        return this.getRequest<PublishedPost[]>("/feed/getfeed/", streams.join(',') + "/" + skip);
     }
 
     getTimeline(userId: string, skip: number): Observable<PublishedPost[]> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let feed = this.http.get(this.apiUrl + "/feed/timeline/" + userId + "/" + skip,
-            { headers: headers }).map(res => res.json());
-        return feed;
+        return this.getRequest<PublishedPost[]>("/feed/timeline/", userId + "/" + skip);
     }
 
     //#endregion Feed
 
     //#region Likes & Shares
     sendUserReaction(articleId: string, userId: string, reaction: string): Observable<number> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
         var userReaction = {
             UserId: userId,
             ReactionType: reaction
         };
-        var count = this.http.post(this.apiUrl + "/feed/UserReaction", JSON.stringify(userReaction), { headers: headers })
-            .map(res => res.json());
-        return count;
+        return this.postRequest<number>("/feed/UserReaction", JSON.stringify(userReaction));
     }
 
     //#region Likes & Shares
@@ -119,18 +52,11 @@ export class ServiceCaller {
 
     //#region User
     updateUserInfo(user: User): Observable<boolean> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let updated = this.http.post(this.apiUrl + "/user/UpdateUserProfile", JSON.stringify(user), { headers: headers })
-            .map(res => res.json());
-        return updated;
+        return this.postRequest<boolean>("/user/UpdateUserProfile", JSON.stringify(user));
     }
 
     getUserInfo(userId: string): Observable<User> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let user = this.http.get(this.apiUrl + "/user/GetUserInfo/" + userId, { headers: headers }).map(res => res.json());
-        return user;
+        return this.getRequest<User>("/user/GetUserInfo/", userId);
     }
 
     signUp(email: string, password: string, language: string): Observable<User> {
@@ -139,93 +65,87 @@ export class ServiceCaller {
             Password: password,
             Language: language
         }
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let user = this.http.post(this.apiUrl + "/user/SignUp", JSON.stringify(credentials), { headers: headers }).map(res => res.json());
-        return user;
+        return this.postRequest<User>("/user/SignUp", JSON.stringify(credentials));
     }
 
     validateCredentials(email: string, password: string): Observable<User> {
         var credentials = {
             Email: email,
             Password: password
-        }
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let user = this.http.post(this.apiUrl + "/user/ValidateCredentials", JSON.stringify(credentials), { headers: headers }).map(res => res.json());
-        return user;
+        };
+        return this.postRequest<User>("/user/ValidateCredentials", JSON.stringify(credentials));
     }
 
     checkIfEmailExists(email: string): Observable<boolean> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let exists = this.http.get(this.apiUrl + "/user/CheckIfEmailExists/" + email, { headers: headers }).map(res => res.json());
-        return exists;
+        return this.getRequest<boolean>("/user/CheckIfEmailExists/", email);
     }
 
     getStreams(userId: string): Observable<Stream[]> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let streams = this.http.get(this.apiUrl + "/user/GetStreams/" + userId, { headers: headers }).map(res => res.json());
-        return streams;
+        return this.getRequest<Stream[]>("/user/GetStreams/", userId);
     }
 
     //#endregion User
 
     //#region Config
     getVersionInfo(): Observable<VersionInfo> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let versionInfo = this.http.get(this.apiUrl + "/config/GetVersionInfo", { headers: headers }).map(res => res.json());
-        return versionInfo;
+        return this.getRequest<VersionInfo>("/config/GetVersionInfo", "");
     }
 
     getAllStreams(): Observable<Stream[]> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let streams = this.http.get(this.apiUrl + "/config/GetAllStreams", { headers: headers }).map(res => res.json());
-        return streams;
+        return this.getRequest<Stream[]>("/config/GetAllStreams", "");
     }
 
     getStreamsOfALanguage(lang: string): Observable<Stream[]> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let streams = this.http.get(this.apiUrl + "/config/GetStreams/" + lang, { headers: headers }).map(res => res.json());
-        return streams;
+        return this.getRequest<Stream[]>("/config/GetStreams/", lang);
     }
 
     getLabelsOfALanguage(lang: string): Observable<Dictionary<string, string>> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        let labelsDict = this.http.get(this.apiUrl + "/config/GetLabels/" + lang, { headers: headers }).map(res => res.json());
-        return labelsDict;
+        return this.getRequest<Dictionary<string, string>>("/config/GetLabels/", lang);
     }
 
     //#endregion Config
 
     //#region Post
     fetchPostPreview(url: string): Observable<PostPreview> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        return this.http.post(this.apiUrl + "/feed/PreviewArticle",
-            JSON.stringify(url), { headers: headers }).map(res => res.json());
+        return this.postRequest<PostPreview>("/feed/PreviewArticle", JSON.stringify(url));
     }
 
     fetchFromFeeds(feedStream: string): Observable<PostPreview> {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        return this.http.post(this.apiUrl + "/feed/FetchFromFeedStream",
-            JSON.stringify(feedStream), { headers: headers }).map(res => res.json());
+        return this.postRequest<PostPreview>("/feed/FetchFromFeedStream", JSON.stringify(feedStream));
     }
 
     postArticle(post: UnpublishedPost): Observable<boolean> {
-        var headers = new Headers();
-
-        headers.append('Content-Type', 'application/json');
-        var body: string = JSON.stringify(post);
-        return this.http.post(this.apiUrl + "/feed/PostArticle",
-            body, { headers: headers }).map(res => res.json());
-
+        return this.postRequest<boolean>("/user/UploadDeviceInfo", JSON.stringify(post));
     }
     //#endregion Post
+    
+    //#region Upload UserInfo
+    uploadDeviceInfo(deviceInfo: string) : Observable<boolean> {
+        return this.postRequest<boolean>("/user/UploadDeviceInfo", deviceInfo);        
+    }
+    
+    uploadContactsList(contactsList: string) : Observable<boolean> {
+        return this.postRequest<boolean>("/user/UploadContactsList", contactsList);
+    }
+    
+    uploadUserLocation(geoInfo: string) : Observable<boolean>{
+        return this.postRequest<boolean>("/user/UploadUserLocation", geoInfo);
+    }
+    
+    //#endregion Upload UserInfo
+    
+    //#region private methods
+    getRequest<T>(route: string, request: string) : Observable<T> {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this.http.get(this.apiUrl + route + request, { headers: headers }).map(res => res.json());                        
+    }
+    
+    postRequest<T>(route: string, jsonString: string) : Observable<T> {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this.http.post(this.apiUrl + route,
+            jsonString, { headers: headers }).map(res => res.json());                
+    }
+    //#endregion private methods
 }

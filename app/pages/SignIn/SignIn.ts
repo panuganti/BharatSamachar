@@ -9,6 +9,10 @@ import {ServiceCaller} from '../../providers/servicecaller';
 import {UserCredentials, CredentialsValidation, VersionInfo} from '../../contracts/DataContracts';
 import {User} from '../../contracts/ServerContracts';
 
+/* TODO: 1) Handle Error and display
+    2) Fetch Email from cordova Device plugin
+*/
+
 @Page({
     templateUrl: 'build/pages/SignIn/SignIn.html'
 })

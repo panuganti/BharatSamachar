@@ -1,18 +1,27 @@
 <ion-navbar *navbar class="show-navbar">
 </ion-navbar>
 
-<ion-content class="has-header components-demo cards-bg social-cards postpage" 
-                    [style.background]="backgroundImageUrl" >
-    <ion-list>
-        <div [hidden]="state!='NoPreview'">
-            <ion-item [hidden]="postSource!=null">
-                <ion-label>Select Source</ion-label>
-                <ion-select [(ngModel)]="postSource">
-                    <ion-option value="url">Url</ion-option>
-                    <ion-option value="feeds">Feeds</ion-option>
-                </ion-select>
+<ion-content class="has-header components-demo cards-bg social-cards postpage">
+    <div [hidden]="state!='NoPreview'">
+        <ion-list>
+            <ion-list-header>
+                URL
+            </ion-list-header>
+            <ion-item>
+                <ion-label floating>Url</ion-label>
+                <ion-input type="text" [(ngModel)]="url" required></ion-input>
             </ion-item>
-            <ion-item [hidden]="!(postSource=='feeds')">
+            <ion-item>
+                <button (click)="loadArticle('url')" block> Fetch </button>
+            </ion-item>
+        </ion-list>
+        <!-- Look for better solution than using a spacer -->
+        <div class="spacer" style="width: auto; height: 100px;"></div>
+        <ion-list>
+            <ion-list-header>
+                FEEDS
+            </ion-list-header>
+            <ion-item>
                 <ion-label>Feed Language</ion-label>
                 <ion-select [(ngModel)]="feedStream">
                     <ion-option value="english">English</ion-option>
@@ -21,34 +30,30 @@
                     <ion-option value="telugu">Telugu</ion-option>
                 </ion-select>
             </ion-item>
-            <ion-item [hidden]="!(postSource=='url')">
-                <ion-label floating>Paste an Url here ...</ion-label>
-                <ion-input type="text" [(ngModel)]="url" required></ion-input>
+            <ion-item>
+                <button (click)="loadArticle('feeds')" block> Fetch </button>
             </ion-item>
-            <ion-item [hidden]="postSource==null">
-                <button (click)="loadArticle()"> Fetch </button>
-            </ion-item>
-        </div>
-    </ion-list>
-    <ion-card *ngIf="postPreview!=undefined && state == 'Preview'">
+        </ion-list>
+    </div>
+    <ion-card *ngIf="postPreview!=undefined && state == 'Preview'" >
         <ion-slides [options]="options">
             <ion-slide *ngFor="#image of postPreview.Images; #i = index">
                 <img [hidden]="!toggleImage" src="{{imageUrl}}" (click)="editImageUrl()">
                 <br>
-                <ion-input *ngIf="!toggleImage" placeholder="Image Url" (change)="editImageUrl()" type=text [(ngModel)]="imageUrl"> 
-                    </ion-input>
+                <ion-textarea *ngIf="!toggleImage" placeholder="Image Url" (blur)="editImageUrl()" type=text [(ngModel)]="imageUrl" rows="5">
+                </ion-textarea>
             </ion-slide>
         </ion-slides>
         <ion-card-content>
             <h2> <b [hidden]="toggleHeadingEditing" (click)="editHeading()">{{postPreview.Heading}}</b>  
-                 <b> <ion-input *ngIf="toggleHeadingEditing" type="text" [(ngModel)]="postPreview.Heading">
-                     </ion-input> </b>
+                 <b> <ion-textarea placeholder="Write heading here.." rows="2" *ngIf="toggleHeadingEditing"  
+                 [(ngModel)]="postPreview.Heading" (blur)="editHeading()">  </ion-textarea> </b>
             </h2>
             <br>
-            <p [hidden]="toggleSnippetEditing" align="justify" (click)="editSnippet()">{{postPreview.Snippet}} </p>
-            <ion-input placeholder="Write snippet here.." *ngIf="toggleSnippetEditing" type="text" [(ngModel)]="postPreview.Snippet">
-            {{postPreview.Snippet}}
-            </ion-input>
+            <p [hidden]="toggleSnippetEditing" align="justify" (click)="editSnippet()" (blur)="editSnippet()">{{postPreview.Snippet}} </p>
+            <ion-textarea placeholder="Write snippet here.." rows="4" *ngIf="toggleSnippetEditing" [(ngModel)]="postPreview.Snippet">
+                {{postPreview.Snippet}}
+            </ion-textarea>
         </ion-card-content>
         <ion-row>
             <ion-item>
@@ -65,15 +70,17 @@
             <ion-input placeholder="Image Tags.." type=text [(ngModel)]="tags" required> </ion-input>
         </ion-row>
         <ion-item>
-            <ion-label>Language</ion-label>
-            <ion-select [(ngModel)]="language">
-                <ion-option value="english">English</ion-option>
-                <ion-option value="hindi">Hindi</ion-option>
-                <ion-option value="marathi">Marathi</ion-option>
-                <ion-option value="telugu">Telugu</ion-option>
-            </ion-select>
+            <ion-row>
+                <ion-col width-33>
+                    <button (click)="publish(true)" block> Skip </button>
+                </ion-col>
+                <ion-col width-33>
+                </ion-col>
+                <ion-col width-33>
+                    <button (click)="publish(false)" block> Publish </button>
+                </ion-col>
+            </ion-row>
         </ion-item>
-        <button (click)="publish()" full> Publish </button>
     </ion-card>
 </ion-content>
 

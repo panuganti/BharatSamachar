@@ -66,13 +66,13 @@
                     </ion-col>
                     -->
                     <ion-col>
-                        <button primary clear small>
-                            <ion-icon name='thumbs-up-outline' (click)="addLike($event, article.Id)"></ion-icon>
+                        <button primary clear>
+                            <ion-icon name='thumbs-up' (click)="addLike($event, article.Id)"></ion-icon>
                             <div>{{article.LikedBy.length}} Likes</div>
                         </button>
                     </ion-col>
                     <ion-col>
-                        <button primary clear small>
+                        <button primary clear>
                             <ion-icon name='md-repeat' (click)="reTweet($event, article.Id)"></ion-icon>
                             <div>{{article.SharedBy.length}} ReTweets</div>
                         </button>

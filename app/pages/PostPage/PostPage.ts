@@ -30,6 +30,7 @@ export class PostPage {
     postSource: string;
     feedStream: string;
     defaultText = 'Write Text Here ..';
+    goodImageExists: boolean = false;
 
     public swiper: any;
     options: any = {
@@ -49,10 +50,9 @@ export class PostPage {
     constructor(public nav: NavController, public config: Config, public service: ServiceCaller) {
     }
 
-    editImageUrl() { this.toggleImage = !this.toggleImage; }
+    editImageUrl() { console.log(this.toggleImage); this.toggleImage = !this.toggleImage; }
     editHeading() { console.log(this.toggleHeadingEditing); 
         this.toggleHeadingEditing = !this.toggleHeadingEditing;
-        console.log(this.toggleHeadingEditing);
      }
     editSnippet() { this.toggleSnippetEditing = !this.toggleSnippetEditing; 
         if (this.postPreview.Snippet == this.defaultText) {
@@ -66,12 +66,14 @@ export class PostPage {
         this.toggleImage = true;         
      }
 
-    publish() {
+    publish(skip: boolean) {
         let streams: string[] = [];
         let tags: string[] = [];
+        console.log(streams);
         if(this.tags != undefined && this.tags != null && this.tags.length > 0) 
-            {tags = this.tags.split(',');}
-        this.streams.forEach(s => streams.push(this.language + '_' + s));
+            { tags = this.tags.split(',');}
+        if (this.streams != undefined && this.streams != null && this.streams.length > 0)
+        { this.streams.forEach(s => streams.push(this.feedStream + '_' + s)); }
         let imageEntity: ImageEntity = {
             Url: this.imageUrl,
             Tags: tags
@@ -83,10 +85,11 @@ export class PostPage {
             OriginalLink: this.postPreview.OriginalLink,
             Image: imageEntity,
             Streams: streams,
-            Language: this.language,
+            Language: this.feedStream,
             PostedBy: this.config.userInfo.Id,
             Tags: [],
-            Date: ""
+            Date: "",
+            ShouldSkip: skip
         };
         var isPostSuccessful = this.service.postArticle(unpublishedPost);
         isPostSuccessful.subscribe((hasSucceeded) => this.loadNextArticle(hasSucceeded));
@@ -97,18 +100,19 @@ export class PostPage {
         this.postSource = null;
         this.postPreview = this.emptyPreview;
         this.url = '';
+        this.goodImageExists = false;
     }
 
     loadNextArticle(hasPrevPostSucceeded: boolean) {
         if (hasPrevPostSucceeded) { this.reset();}
     }
 
-    loadArticle() {
+    loadArticle(postSource: string) {
         var articleData;
-        if (this.postSource == 'url') {
+        if (postSource == 'url') {
              articleData = this.service.fetchPostPreview(this.url);
         }
-        else if (this.postSource == 'feeds') {
+        else if (postSource == 'feeds') {
             articleData = this.service.fetchFromFeeds(this.feedStream);
         }
         articleData.subscribe(data => { this.postPreview = data; this.prepareForEditing();});
@@ -136,6 +140,7 @@ export class PostPage {
 
     parentMethod(width: number, height: number, fwd: boolean) {
         if (width < 200 || height < 200) {
+            this.goodImageExists = true;
             if (fwd) { this.loadNextImage(); }
             else { this.loadPrevImage(); }
         }
@@ -160,7 +165,7 @@ export class PostPage {
             this.dbImageCounter++;
             this.imageUrl = this.postPreview.ImagesFromDb[this.imageCounter].Url;
         }
-        else if ((this.imageCounter == this.postPreview.Images.length - 1) && (this.dbImageCounter >= this.postPreview.ImagesFromDb.length - 1))
+        else if ((this.imageCounter == this.postPreview.Images.length - 1) && (this.dbImageCounter >= this.postPreview.ImagesFromDb.length - 1) && this.goodImageExists)
         {
             this.imageCounter = -1;
             this.dbImageCounter = -1;

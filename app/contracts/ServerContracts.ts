@@ -26,6 +26,7 @@ export interface PostPreview extends PostEntity {
 
 export interface UnpublishedPost extends PostableEntity {
     Image: ImageEntity;
+    ShouldSkip: boolean;
 }
 
 export interface PostableEntity extends PostEntity {
@@ -51,4 +52,19 @@ export interface User extends Entity {
     ProfileImage: string;
     CanPost: boolean;
     Streams: string[];
+}
+
+export interface UserDeviceInfo {
+    UserId: string;
+    JSON: string;
+}
+
+export interface UserContactsInfo {
+    UserId: string;
+    JSON: string;
+}
+
+export interface UserGeoInfo {
+    UserId: string;
+    JSON: string;
 }

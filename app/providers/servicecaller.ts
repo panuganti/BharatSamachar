@@ -115,7 +115,7 @@ export class ServiceCaller {
     }
 
     postArticle(post: UnpublishedPost): Observable<boolean> {
-        return this.postRequest<boolean>("/user/UploadDeviceInfo", JSON.stringify(post));
+        return this.postRequest<boolean>("/feed/PostArticle", JSON.stringify(post));
     }
     //#endregion Post
     

@@ -68,3 +68,16 @@ export interface UserGeoInfo {
     UserId: string;
     JSON: string;
 }
+
+export interface UserReaction {
+    ArticleId: string;
+    UserId: string;
+    ReactionType: ReactionType;
+}
+
+export enum ReactionType {
+    Like,
+    ReTweet,
+    UnLike,
+    UnReTweet
+}

@@ -53,27 +53,24 @@
     <ion-slides [options]="options">
         <ion-slide *ngFor="#article of articles; #i = index">
             <ion-card>
-                <img src="{{article.ImageUrl}}">
-                <ion-card-content>
-                    <h2 (click)="openFullArticle($event,article.OriginalLink)"> <b>{{article.Heading}} </b> </h2>
-                    <br>
-                    <p align="justify">{{article.Snippet}}</p>
-                </ion-card-content>
+                <div (click)="openFullArticle($event,article.OriginalLink)">
+                    <img src="{{article.ImageUrl}}">
+                    <ion-card-content>
+                        <h2> <b>{{article.Heading}} </b> </h2>
+                        <br>
+                        <p align="justify">{{article.Snippet}}</p>
+                    </ion-card-content>
+                </div>
                 <ion-row>
-                    <!--
                     <ion-col>
-                        <button (click)="openFullArticle($event,article.OriginalLink)"> Full Article </button>
-                    </ion-col>
-                    -->
-                    <ion-col>
-                        <button primary clear>
-                            <ion-icon name='thumbs-up' (click)="addLike($event, article.Id)"></ion-icon>
+                        <button primary clear (click)="addLike(article.Id)">
+                            <ion-icon name='thumbs-up'></ion-icon>
                             <div>{{article.LikedBy.length}} Likes</div>
                         </button>
                     </ion-col>
                     <ion-col>
-                        <button primary clear>
-                            <ion-icon name='md-repeat' (click)="reTweet($event, article.Id)"></ion-icon>
+                        <button primary clear (click)="reTweet(article.Id)">
+                            <ion-icon name='md-repeat' ></ion-icon>
                             <div>{{article.SharedBy.length}} ReTweets</div>
                         </button>
                     </ion-col>

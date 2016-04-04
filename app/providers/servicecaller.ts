@@ -14,8 +14,8 @@ import {PostPreview, UnpublishedPost, User, PublishedPost} from '../contracts/Se
 @Injectable()
 export class ServiceCaller {
     url: string = "https://script.google.com/macros/s/AKfycbz2ZMnHuSR4GmTjsuIo6cmh433RRpPRH7TwMaJhbAUr/dev";
-    apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
-    //apiUrl: string = "http://localhost:54909";
+    //apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
+    apiUrl: string = "http://localhost:54909";
 
     constructor(public cache: Cache, public http: Http) {
 
@@ -39,12 +39,13 @@ export class ServiceCaller {
     //#endregion Feed
 
     //#region Likes & Shares
-    sendUserReaction(articleId: string, userId: string, reaction: string): Observable<number> {
+    sendUserReaction(articleId: string, userId: string, reaction: string): Observable<string[]> {
         var userReaction = {
+            ArticleId: articleId, 
             UserId: userId,
             ReactionType: reaction
         };
-        return this.postRequest<number>("/feed/UserReaction", JSON.stringify(userReaction));
+        return this.postRequest<string[]>("/feed/AddUserReaction", JSON.stringify(userReaction));
     }
 
     //#region Likes & Shares
@@ -144,6 +145,8 @@ export class ServiceCaller {
     postRequest<T>(route: string, jsonString: string) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
+        console.log(route);
+        console.log(jsonString);
         return this.http.post(this.apiUrl + route,
             jsonString, { headers: headers }).map(res => res.json());                
     }

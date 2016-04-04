@@ -75,19 +75,20 @@ export class NewsFeed {
     }
 
     //#region User Reaction
-    addLike(event: any, id: string) {
-        this.service.sendUserReaction(id, this.config.userInfo.Id, 'Like');
+    addLike(article: PublishedPost) {
+        var likes = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'Like');
+        likes.subscribe(data => article.LikedBy);
     }
 
-    removeLike(event: any, id: string) {
+    removeLike(id: string) {
         this.service.sendUserReaction(id, this.config.userInfo.Id, 'UnLike');
     }
 
-    reTweet(event: any, id: string) {
+    reTweet(id: string) {
         this.service.sendUserReaction(id, this.config.userInfo.Id, 'ReTweet');
     }
 
-    undoReTweet(event: any, id: string) {
+    undoReTweet(id: string) {
         this.service.sendUserReaction(id, this.config.userInfo.Id, 'UnReTweet');
     }    
     //#endregion User Reaction

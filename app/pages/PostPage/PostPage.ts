@@ -109,6 +109,7 @@ export class PostPage {
 
     loadArticle(postSource: string) {
         this.state = 'Loading';
+        this.postSource = postSource;
         var articleData;
         if (postSource == 'url') {
              articleData = this.service.fetchPostPreview(this.url);

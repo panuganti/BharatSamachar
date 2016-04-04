@@ -75,6 +75,15 @@
         <ion-row>
             <ion-input placeholder="Image Tags.." type=text [(ngModel)]="tags" required> </ion-input>
         </ion-row>
+        <ion-item [hidden]="postSource!='url'">
+            <ion-label>Language</ion-label>
+            <ion-select [(ngModel)]="feedStream">
+                <ion-option value="english">English</ion-option>
+                <ion-option value="hindi">Hindi</ion-option>
+                <ion-option value="marathi">Marathi</ion-option>
+                <ion-option value="telugu">Telugu</ion-option>
+            </ion-select>
+        </ion-item>
         <ion-item>
             <ion-row>
                 <ion-col width-33>

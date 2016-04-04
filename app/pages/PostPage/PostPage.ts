@@ -50,10 +50,8 @@ export class PostPage {
     constructor(public nav: NavController, public config: Config, public service: ServiceCaller) {
     }
 
-    editImageUrl() { console.log(this.toggleImage); this.toggleImage = !this.toggleImage; }
-    editHeading() { console.log(this.toggleHeadingEditing); 
-        this.toggleHeadingEditing = !this.toggleHeadingEditing;
-     }
+    editImageUrl() { this.toggleImage = !this.toggleImage; }
+    editHeading() { this.toggleHeadingEditing = !this.toggleHeadingEditing; }
     editSnippet() { this.toggleSnippetEditing = !this.toggleSnippetEditing; 
         if (this.postPreview.Snippet == this.defaultText) {
             this.postPreview.Snippet = '';

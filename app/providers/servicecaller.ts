@@ -145,8 +145,6 @@ export class ServiceCaller {
     postRequest<T>(route: string, jsonString: string) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        console.log(route);
-        console.log(jsonString);
         return this.http.post(this.apiUrl + route,
             jsonString, { headers: headers }).map(res => res.json());                
     }

@@ -31,11 +31,17 @@
                 </ion-select>
             </ion-item>
             <ion-item>
-                <button (click)="loadArticle('feeds')" block> Fetch </button>
+                <button [disabled]="state=='Loading'" (click)="loadArticle('feeds')" block> Fetch </button>
             </ion-item>
         </ion-list>
     </div>
-    <ion-card *ngIf="postPreview!=undefined && state == 'Preview'" >
+    <!-- TODO: Replace with Splashscreen -->
+    <div [hidden]="state!='Loading'">
+        <div class="spacer" style="width: auto; height: 150px;"></div>
+        <center> Loading ... </center>
+    </div>
+
+    <ion-card *ngIf="postPreview!=undefined && state == 'Preview'">
         <ion-slides [options]="options">
             <ion-slide *ngFor="#image of postPreview.Images; #i = index">
                 <img [hidden]="!toggleImage" src="{{imageUrl}}" (click)="editImageUrl()">

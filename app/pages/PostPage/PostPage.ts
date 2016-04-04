@@ -69,7 +69,6 @@ export class PostPage {
     publish(skip: boolean) {
         let streams: string[] = [];
         let tags: string[] = [];
-        console.log(streams);
         if(this.tags != undefined && this.tags != null && this.tags.length > 0) 
             { tags = this.tags.split(',');}
         if (this.streams != undefined && this.streams != null && this.streams.length > 0)
@@ -101,6 +100,7 @@ export class PostPage {
         this.postPreview = this.emptyPreview;
         this.url = '';
         this.goodImageExists = false;
+        this.streams = [];
     }
 
     loadNextArticle(hasPrevPostSucceeded: boolean) {
@@ -108,6 +108,7 @@ export class PostPage {
     }
 
     loadArticle(postSource: string) {
+        this.state = 'Loading';
         var articleData;
         if (postSource == 'url') {
              articleData = this.service.fetchPostPreview(this.url);

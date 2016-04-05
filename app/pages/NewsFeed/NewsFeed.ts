@@ -107,7 +107,6 @@ export class NewsFeed {
 
     //#region Modals 
     showContacts() {
-        console.log("show contacts");
         this.nav.push(ContactsPage);
     }
 

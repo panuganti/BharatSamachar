@@ -122,15 +122,15 @@ export class ServiceCaller {
     
     //#region Upload UserInfo
     uploadDeviceInfo(deviceInfo: string) : Observable<boolean> {
-        return this.postRequest<boolean>("/user/UploadDeviceInfo", deviceInfo);        
+        return this.postRequest<boolean>("/user/UpdateUserDeviceInfo", deviceInfo);        
     }
     
     uploadContactsList(contactsList: string) : Observable<boolean> {
-        return this.postRequest<boolean>("/user/UploadContactsList", contactsList);
+        return this.postRequest<boolean>("/user/UpdateUserContactList", contactsList);
     }
     
     uploadUserLocation(geoInfo: string) : Observable<boolean>{
-        return this.postRequest<boolean>("/user/UploadUserLocation", geoInfo);
+        return this.postRequest<boolean>("/user/UpdateUserGeoInfo", geoInfo);
     }
     
     //#endregion Upload UserInfo

@@ -5,6 +5,8 @@ import {UserNotification} from '../../contracts/DataContracts';
 
 import {Config} from '../../providers/config';
 
+import {UserContactsInfo, UserDeviceInfo, UserGeoInfo} from '../../contracts/ServerContracts';
+
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
 
@@ -14,13 +16,19 @@ import 'rxjs/add/operator/retry';
 })
 export class ContactsPage {
     contacts: Contact[] = [];
-    notifications: UserNotification[] = [];                   
+    notifications: UserNotification[] = [];
+    doneLabel: string = 'Done';
+
     constructor(public config: Config, public nav: NavController, public platform: Platform) {
-       console.log("in contacts page");
-    }    
-        
+    }
+
+    loadContacts() {
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => { this.contacts = data; console.log(data)});
+    }
+
     saveAndGoBack() {
-       // write settings to cloud       
-       this.nav.pop();
-     }    
+        // write settings to cloud       
+        this.nav.pop();
+    }
 }

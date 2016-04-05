@@ -1,6 +1,4 @@
 import {App, Platform} from 'ionic-angular';
-import {Contacts, Device, Geolocation} from 'ionic-native';
-import {Contact} from 'ionic-native/dist/plugins/contacts';
 
 import {NewsFeed} from './pages/NewsFeed/NewsFeed';
 import {SignIn} from './pages/SignIn/SignIn';
@@ -9,7 +7,6 @@ import {Categories} from './pages/Categories/Categories';
 import {Config} from './providers/config';
 import {ServiceCaller} from './providers/servicecaller';
 import {Cache} from './providers/cache';
-import {UserContactsInfo, UserDeviceInfo, UserGeoInfo} from './contracts/ServerContracts';
 // https://angular.io/docs/ts/latest/api/core/Type-interface.html
 import {Type, enableProdMode} from 'angular2/core';
 
@@ -27,43 +24,16 @@ enableProdMode();
 })
 export class MyApp {
     rootPage: Type;
-    contacts: Contact[];
 
     constructor(platform: Platform, public service: ServiceCaller, public cache: Cache, public config: Config) {
         this.config.initTimer();
         platform.ready().then(() => {
             this.init();
-            this.uploadUserAndDeviceInfo();
         });
     }
 
     init() {
             let labels = this.service.getLabelsOfALanguage(this.config.language);
             labels.subscribe((data) => { this.cache.setLabels(data); this.rootPage = SignIn; }, (err) => {console.log(err); this.rootPage = SignIn; });
-    }
-    
-    uploadUserAndDeviceInfo() {
-        var contactJson: UserContactsInfo;
-        var deviceJson: UserDeviceInfo;
-        var geoJson: UserGeoInfo;
-        
-        // Contacts List
-        var contactsList = Contacts.find(['*']);
-        contactsList.then(data => { this.contacts = data;
-            contactJson = { UserId: null, JSON: JSON.stringify(data) }
-            this.service.uploadContactsList(JSON.stringify(contactJson));
-             });
-        
-        // Device Info
-        deviceJson = { UserId: null, JSON: JSON.stringify(Device.device) }
-        this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
-        
-        // Geo-location
-        let geoPos = Geolocation.getCurrentPosition();
-        geoPos.then(data =>    {     
-                    geoJson = { UserId: null, JSON: JSON.stringify(data)};
-                    this.service.uploadUserLocation(JSON.stringify(geoJson))}
-                );        
-    }
-    
+    }    
 }

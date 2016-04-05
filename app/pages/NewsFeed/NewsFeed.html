@@ -63,7 +63,7 @@
                 </div>
                 <ion-row>
                     <ion-col>
-                        <ion-icon [hidden]="contains(article.LikedBy,config.userInfo.Id)" (click)="addLike(article)" name='thumbs-up-outline'></ion-icon>
+                        <ion-icon [hidden]="contains(article.LikedBy,config.userInfo.Id)" (click)="addLike(article)" name='ios-thumbs-up-outline'></ion-icon>
                         <ion-icon [hidden]="!contains(article.LikedBy,config.userInfo.Id)" (click)="removeLike(article)" name='thumbs-up'></ion-icon>
                         {{article.LikedBy.length}}
                     </ion-col>

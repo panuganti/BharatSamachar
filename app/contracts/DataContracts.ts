@@ -18,7 +18,6 @@ export enum CardStyle {
     Vertical = 1
 }
 
-
 export interface UserCredentials {
     Email: string;
     Password: string;    
@@ -54,7 +53,8 @@ export interface CredentialsValidation {
     Message: string;
 }
 
-export interface Stream extends EntityWithText {
+export interface Stream {
+    Text: string;
     Lang: string;
     IsAdmin: boolean;
     UserSelected: boolean;

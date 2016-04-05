@@ -1,16 +1,13 @@
 <ion-navbar *navbar hideBackButton class="show-navbar">
-    <ion-title>
-        <center>{{categories}} </center>
-    </ion-title>
     <ion-buttons end>
         <button (click)="saveAndGoBack()">
-            {{done}}
+            {{doneLabel}}
         </button>
     </ion-buttons>
 </ion-navbar>
 
 <ion-content>
-    <div *ngFor="#item of config.categories; #i = index">
+    <div *ngFor="#item of streams; #i = index">
         <ion-col>
             <!-- width-50 style="float: left" -->
             <ion-card class="category" [style.background]="item.backgroundImageUrl">
@@ -23,12 +20,11 @@
     </div>
 </ion-content>
 
-<style> 
+<style>
     .category {
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: 50% 50%;    
-    color: white;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        background-position: 50% 50%;
+        color: black;
     }
-    
 </style>

@@ -63,16 +63,14 @@
                 </div>
                 <ion-row>
                     <ion-col>
-                        <button primary clear (click)="addLike(article.Id)">
-                            <ion-icon name='thumbs-up'></ion-icon>
-                            <div>{{article.LikedBy.length}} Likes</div>
-                        </button>
+                        <ion-icon [hidden]="contains(article.LikedBy,config.userInfo.Id)" (click)="addLike(article)" name='thumbs-up-outline'></ion-icon>
+                        <ion-icon [hidden]="!contains(article.LikedBy,config.userInfo.Id)" (click)="removeLike(article)" name='thumbs-up'></ion-icon>
+                        {{article.LikedBy.length}}
                     </ion-col>
                     <ion-col>
-                        <button primary clear (click)="reTweet(article.Id)">
-                            <ion-icon name='md-repeat' ></ion-icon>
-                            <div>{{article.SharedBy.length}} ReTweets</div>
-                        </button>
+                        <ion-icon [hidden]="contains(article.SharedBy,config.userInfo.Id)" (click)="reTweet(article)" name='ios-repeat'></ion-icon>
+                        <ion-icon [hidden]="!contains(article.SharedBy,config.userInfo.Id)" (click)="undoReTweet(article)" name='md-repeat'></ion-icon>
+                        {{article.SharedBy.length}}
                     </ion-col>
                     <!--
                     <ion-col center text-center>

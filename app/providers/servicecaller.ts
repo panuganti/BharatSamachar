@@ -14,8 +14,8 @@ import {PostPreview, UnpublishedPost, User, PublishedPost} from '../contracts/Se
 @Injectable()
 export class ServiceCaller {
     url: string = "https://script.google.com/macros/s/AKfycbz2ZMnHuSR4GmTjsuIo6cmh433RRpPRH7TwMaJhbAUr/dev";
-    apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
-    //apiUrl: string = "http://localhost:54909";
+    //apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
+    apiUrl: string = "http://localhost:54909";
 
     constructor(public cache: Cache, public http: Http) {
 
@@ -48,7 +48,7 @@ export class ServiceCaller {
         return this.postRequest<string[]>("/feed/AddUserReaction", JSON.stringify(userReaction));
     }
 
-    //#region Likes & Shares
+    //#endregion Likes & Shares
 
 
     //#region User

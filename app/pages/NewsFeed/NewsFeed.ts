@@ -37,11 +37,11 @@ export class NewsFeed {
         keyboardControl: true,
         mousewheelControl: true,
         onlyExternal: false,
-        onInit: (slides: any) => {this.swiper = slides; this.refresh(); }
+        onInit: (slides: any) => { this.swiper = slides; this.refresh(); }
     };
 
-    constructor(public http: Http, public nav: NavController, public navParams: NavParams, 
-                                        public config: Config, public service: ServiceCaller) {
+    constructor(public http: Http, public nav: NavController, public navParams: NavParams,
+        public config: Config, public service: ServiceCaller) {
     }
 
     onPageWillEnter() {
@@ -51,9 +51,9 @@ export class NewsFeed {
     createNewPost() {
         this.nav.push(PostPage);
     }
-    
+
     refresh() {
-        this.swiper.slideTo(0,100,true); // Note: see api
+        this.swiper.slideTo(0, 100, true); // Note: see api
         this.fetchArticles(this.config.userInfo.Streams);
     }
 
@@ -74,23 +74,35 @@ export class NewsFeed {
         this.articles = art.slice();
     }
 
+    //#region Utils
+    contains(array: any[], value: any): boolean {
+        for (var elem of array) {
+            if (elem === value) { return true; }
+        }
+        return false;
+    }
+    //#endregion Utils
+
     //#region User Reaction
     addLike(article: PublishedPost) {
         var likes = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'Like');
-        likes.subscribe(data => article.LikedBy);
+        likes.subscribe(data => { article.LikedBy = data; });
     }
 
-    removeLike(id: string) {
-        this.service.sendUserReaction(id, this.config.userInfo.Id, 'UnLike');
+    removeLike(article: PublishedPost) {
+        var likes = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'UnLike');
+        likes.subscribe(data => { article.LikedBy = data; });
     }
 
-    reTweet(id: string) {
-        this.service.sendUserReaction(id, this.config.userInfo.Id, 'ReTweet');
+    reTweet(article: PublishedPost) {
+        var shares = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'ReTweet');
+        shares.subscribe(data => { article.SharedBy = data; });
     }
 
-    undoReTweet(id: string) {
-        this.service.sendUserReaction(id, this.config.userInfo.Id, 'UnReTweet');
-    }    
+    undoReTweet(article: PublishedPost) {
+        var shares = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'UnReTweet');
+        shares.subscribe(data => { article.SharedBy = data; });
+    }
     //#endregion User Reaction
 
     //#region Modals 

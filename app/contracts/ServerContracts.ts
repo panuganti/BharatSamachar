@@ -25,7 +25,6 @@ export interface UserContact {
     Name: string;
     Email: string;
     Phone: string;
-    follow: boolean; 
     profileImg: string;
     isFollowing: boolean;
 }

@@ -7,16 +7,24 @@
 </ion-navbar>
 
 <ion-content>
-    Loading Contacts ...
     <ion-list>
-        <ion-item *ngFor="#item of contacts; #i = index">
-            <ion-label>  
-    Display Name: {{item.displayName}} <br>
-    Name: {{item.name == null ? "null" : item.name.formatted}} <br>
-    PhoneNumber: {{item.phoneNumbers == null ? "null" : item.phoneNumbers[0].value}} <br>
-    Emails: {{item.emails == null ? "null" : item.emails[0].value}}; <br>
-    B'Day: {{item.birthday}} <br>                
-                </ion-label>
-        </ion-item>
+        <ion-item-sliding *ngFor="#item of contactsWithEmailsOrPhones; #i = index">
+            <ion-item>
+                <ion-avatar item-left>
+                    <img [hidden]="item.profileImg!=''" src="item.profileImg">                    
+                    <img [hidden]="item.src==undefined || item.src==undefined==''" src="resources/person_placeholder.jpg">
+                </ion-avatar>
+                <h2>{{item.displayName}}</h2> 
+                <p [hidden]='item.isOnNetwork'> {{defaultInviteLabel}} </p>
+                <p [hidden]='!item.isOnNetwork'> {{defaultGreetingLabel}} </p>
+                <button [hidden]='item.isOnNetwork' secondary item-right (click)="invite(item)">INVITE</button>
+            </ion-item> 
+            <ion-item-options>
+                <button [hidden]="!item.isOnNetwork || item.isFollowing" (click)="unFollow(item)">UnFollow</button>
+                <button [hidden]="item.isOnNetwork && item.Phone.length==0" (click)="inviteBySMS(item)">SMS</button>
+                <button [hidden]="item.isOnNetwork && item.Email.length==0" (click)="inviteByMail(item)">Email</button>
+                <button (click)="delete(item)">Delete</button>
+            </ion-item-options>
+        </ion-item-sliding>
     </ion-list>
 </ion-content>

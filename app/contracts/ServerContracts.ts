@@ -1,5 +1,6 @@
 import {Entity} from "./DataContracts";
 
+
 export interface PostEntity {
     Date: string;
     CardStyle: string;
@@ -17,6 +18,16 @@ export interface DbImage extends ImageEntity {
     Id: string;
     Width: string;
     Height: string;
+}
+
+export interface UserContact {
+    isOnNetwork: boolean;
+    Name: string;
+    Email: string;
+    Phone: string;
+    follow: boolean; 
+    profileImg: string;
+    isFollowing: boolean;
 }
 
 export interface PostPreview extends PostEntity {

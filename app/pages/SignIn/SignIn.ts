@@ -40,6 +40,7 @@ export class SignIn {
         this.uploadUserAndDeviceInfo();
     }
 
+    // TODO: Move this to app.ts
     checkIfUserIsLoggedIn() {
         let user: User = JSON.parse(window.localStorage['user'] || '{}');
  
@@ -98,7 +99,7 @@ export class SignIn {
     }
     
     //#region User Info
-        uploadUserAndDeviceInfo() {
+    uploadUserAndDeviceInfo() {
         var contactJson: UserContactsInfo;
         var deviceJson: UserDeviceInfo;
         var geoJson: UserGeoInfo;

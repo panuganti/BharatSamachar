@@ -9,13 +9,13 @@ import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 import {Config} from './config';
 import {Cache} from './cache';
 import {Article, UserNotification, VersionInfo, ConfigData, Stream, CredentialsValidation} from '../contracts/DataContracts';
-import {PostPreview, UnpublishedPost, User, PublishedPost} from '../contracts/ServerContracts';
+import {PostPreview, UnpublishedPost, User, PublishedPost, UserContact} from '../contracts/ServerContracts';
 
 @Injectable()
 export class ServiceCaller {
     url: string = "https://script.google.com/macros/s/AKfycbz2ZMnHuSR4GmTjsuIo6cmh433RRpPRH7TwMaJhbAUr/dev";
-    apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
-    //apiUrl: string = "http://localhost:54909";
+    //apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
+    apiUrl: string = "http://localhost:54909";
 
     constructor(public cache: Cache, public http: Http) {
 
@@ -85,6 +85,17 @@ export class ServiceCaller {
         return this.getRequest<Stream[]>("/user/GetStreams/", userId);
     }
 
+    unFollow(userContact: UserContact): Observable<boolean> {
+        return this.postRequest<boolean>("/user/UnFollow", JSON.stringify(userContact));
+    }
+
+    deleteContact(userContact: UserContact): Observable<boolean> {
+        return this.postRequest<boolean>("/user/DelteContact", JSON.stringify(userContact));
+    }
+    
+    fetchContacts(userId: string) : Observable<UserContact[]>{
+        return this.getRequest("/user/FetchContacts/", userId);
+    }
     //#endregion User
 
     //#region Config

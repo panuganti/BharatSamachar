@@ -30,7 +30,17 @@
         },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "io.ionic.starter"
+        },
+        "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "io.ionic.starter"
+        },
+        "cordova-plugin-badge": {
+            "PACKAGE_NAME": "io.ionic.starter"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-app-event": {
+            "PACKAGE_NAME": "io.ionic.starter"
+        }
+    }
 }

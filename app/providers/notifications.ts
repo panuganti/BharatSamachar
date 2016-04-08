@@ -1,11 +1,11 @@
 import {LocalNotifications, Badge} from 'ionic-native';
-
 import {Injectable} from 'angular2/core';
 
+import {ServiceCaller} from './servicecaller';
 
 @Injectable()
 export class Notifications {
-    constructor() { }
+    constructor(public service: ServiceCaller) { }
 
     sendNotification(message: string) {
         LocalNotifications.schedule({
@@ -23,7 +23,11 @@ export class Notifications {
 
     }
 
-    setBadge(number: number) {
+    continousCheckForNotifications(userId: string) {
+        this.service.checkForNotifications(userId).subscribe(data => {});
+    }
 
+    setBadge(number: number) {
+        Badge.set(number);
     }
 }

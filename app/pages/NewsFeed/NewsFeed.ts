@@ -11,14 +11,14 @@ import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 import {PublishedPost} from '../../contracts/ServerContracts';
 import {UserSettings} from '../UserSettings/UserSettings';
 import {ContactsPage} from '../ContactsPage/ContactsPage';
-import {Notifications} from '../Notifications/Notifications';
+//import {Notifications} from '../Notifications/Notifications';
 import {FullArticle} from '../FullArticle/FullArticle';
 import {PostPage} from '../PostPage/PostPage';
 
 import {Categories} from '../Categories/Categories';
 import {Config} from '../../providers/config';
 import {ServiceCaller} from '../../providers/servicecaller';
-
+import {Notifications} from '../../providers/notifications';
 
 
 @Page({
@@ -41,7 +41,13 @@ export class NewsFeed {
     };
 
     constructor(public http: Http, public nav: NavController, public navParams: NavParams,
-        public config: Config, public service: ServiceCaller) {
+        public config: Config, public service: ServiceCaller, public notifications: Notifications) {
+            
+    }
+    
+    sendNotifiation() {
+        this.notifications.sendNotification("Hello World 2");
+        this.notifications.setBadge(2);
     }
 
     onPageWillEnter() {

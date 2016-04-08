@@ -14,16 +14,19 @@ import {PostPreview, UnpublishedPost, User, PublishedPost, UserContact} from '..
 @Injectable()
 export class ServiceCaller {
     url: string = "https://script.google.com/macros/s/AKfycbz2ZMnHuSR4GmTjsuIo6cmh433RRpPRH7TwMaJhbAUr/dev";
-    //apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
-    apiUrl: string = "http://localhost:54909";
+    apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
+    //apiUrl: string = "http://localhost:54909";
 
     constructor(public cache: Cache, public http: Http) {
-
     }
 
     // TODO: Move to Cache
     prefetchImages(articles: Article[]) {
         articles.forEach(article => this.http.get(article.Image));
+    }
+
+    checkForNotifications(userId: string) : Observable<any[]> {
+        return this.getRequest<any[]>("/notifications/getNotifications", userId);
     }
 
     //#region Feed
@@ -150,14 +153,14 @@ export class ServiceCaller {
     getRequest<T>(route: string, request: string) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        return this.http.get(this.apiUrl + route + request, { headers: headers }).map(res => res.json());                        
+        return this.http.get(this.apiUrl + route + request, { headers: headers }).retry(3).map(res => res.json());                        
     }
     
     postRequest<T>(route: string, jsonString: string) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http.post(this.apiUrl + route,
-            jsonString, { headers: headers }).map(res => res.json());                
+            jsonString, { headers: headers }).retry(3).map(res => res.json());
     }
     //#endregion private methods
 }

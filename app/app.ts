@@ -36,6 +36,7 @@ export class MyApp {
     init() {
         let labels = this.service.getLabelsOfALanguage(this.config.language);
         labels.subscribe((data) => { this.cache.setLabels(data); this.rootPage = SignIn; }, (err) => { console.log(err); this.rootPage = SignIn; });
+        // Check if user is logged in, set root page to NewsFeed
     }
 
 }

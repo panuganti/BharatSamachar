@@ -6,6 +6,7 @@ import {NewsFeed} from '../NewsFeed/NewsFeed';
 import {Config} from '../../providers/config';
 import {Cache} from '../../providers/cache';
 import {ServiceCaller} from '../../providers/servicecaller';
+import {Notifications} from '../../providers/notifications';
 import {UserCredentials, CredentialsValidation, VersionInfo} from '../../contracts/DataContracts';
 import {User} from '../../contracts/ServerContracts';
 
@@ -35,9 +36,15 @@ export class SignIn {
 
     contacts: Contact[];
 
-    constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller) {
-        this.checkIfUserIsLoggedIn();
-        this.uploadUserAndDeviceInfo();
+    constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller, public notifications: Notifications) {
+        //this.checkIfUserIsLoggedIn();
+        //this.uploadUserAndDeviceInfo();
+        this.sendNotification();
+    }
+    
+    sendNotification() {
+        this.notifications.sendNotification("Hello World");
+        this.notifications.setBadge(1);
     }
 
     // TODO: Move this to app.ts

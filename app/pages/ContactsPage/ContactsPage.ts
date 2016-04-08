@@ -37,7 +37,7 @@ export class ContactsPage {
     // TODO: Delete .. Fetch from local store or remote
     loadContactsFromFile() {
         this.http.get(this.contactsJsonFile).map(res => res.json())
-        .subscribe(data => this.filterContacts(data));
+        .subscribe(data => { this.filterContacts(data) });
     }
 
     fetchContacts(userId: string) {
@@ -46,7 +46,7 @@ export class ContactsPage {
     }
 
     filterContacts(data: UserContact[]) {
-        this.userContacts = Enumerable.From(data).OrderBy(elem => elem.Name).ToArray();
+         this.userContacts = Enumerable.From(data).OrderBy(elem => elem.Name).ToArray();
     }
 
     loadContacts() {

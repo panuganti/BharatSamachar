@@ -14,6 +14,13 @@ import {UserContactsInfo, UserDeviceInfo, UserGeoInfo} from '../../contracts/Ser
 import {Contacts, Device, Geolocation} from 'ionic-native';
 import {Contact} from 'ionic-native/dist/plugins/contacts';
 
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/Rx'; // required for catch;
+import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/do';  // debug
+import 'rxjs/add/operator/catch';
+
 /* TODO: 1) Handle Error and display
     2) Fetch Email from cordova Device plugin
 */
@@ -55,7 +62,6 @@ export class SignIn {
         userInfo.subscribe((data) => {
             let firstTime = false; if (data.Language == null) {firstTime = true;}
             this.config.setUserInfo(data); if (navigate) this.navigate(firstTime);});
-            //userInfo.catch(e => {console.log(e); return e;});
     }
 
     navigate(firstTime: boolean) {
@@ -64,11 +70,10 @@ export class SignIn {
     }
 
     login() {
-       try {
         let validation = this.service.validateCredentials(this.email, this.password);
         validation.subscribe(data => {let firstTime = false; if (data.Language == null) {firstTime = true;} 
                     this.storeCredAndGoToHome(data, firstTime); });
-       } catch (error) {console.log(error)};             
+
     }
 
     storeCredAndGoToHome(user: User, firstTime: boolean) {
@@ -78,10 +83,9 @@ export class SignIn {
     }
 
     signup() {
-        try {
         let signup = this.service.signUp(this.email, this.password, this.language);
         signup.subscribe(data => this.storeCredAndGoToHome(data, true));
-        } catch (error) {console.log(error)};
+        signup.catch(e => {console.log("caught you"); console.log(e); return e;});
     }
 
     loadLabels() {

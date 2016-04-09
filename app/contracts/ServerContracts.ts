@@ -20,6 +20,19 @@ export interface DbImage extends ImageEntity {
     Height: string;
 }
 
+export interface UserNotification {
+    badge: number;
+    notifications: Notification[];
+}
+
+export interface Notification {
+    Priority: number;
+    Heading: string;
+    Text: string;
+    DateTime: string;
+    Id: string;
+}
+
 export interface UserContact {
     isOnNetwork: boolean;
     Name: string;
@@ -61,7 +74,15 @@ export interface User extends Entity {
     Name: string;
     ProfileImage: string;
     CanPost: boolean;
-    Streams: string[];
+    Streams: Stream[];
+}
+
+export interface Stream {
+    Text: string;
+    Lang: string;
+    IsAdmin: boolean;
+    UserSelected: boolean;
+    backgroundImageUrl: string;
 }
 
 export interface UserDeviceInfo {

@@ -1,18 +1,23 @@
 import {App, Platform} from 'ionic-angular';
+// https://angular.io/docs/ts/latest/api/core/Type-interface.html
+import {Type, enableProdMode} from 'angular2/core';
+import {Contacts, Device, Geolocation} from 'ionic-native';
+
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 
 import {NewsFeed} from './pages/NewsFeed/NewsFeed';
 import {SignIn} from './pages/SignIn/SignIn';
 import {UserSettings} from './pages/UserSettings/UserSettings';
 import {Categories} from './pages/Categories/Categories';
+
 import {Config} from './providers/config';
 import {ServiceCaller} from './providers/servicecaller';
 import {Notifications} from './providers/notifications';
 import {Cache} from './providers/cache';
-// https://angular.io/docs/ts/latest/api/core/Type-interface.html
-import {Type, enableProdMode} from 'angular2/core';
 
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/fromArray'; // required for Observable.of();
+
+import {User, UserContactsInfo, UserDeviceInfo, UserGeoInfo} from './contracts/ServerContracts';
 
 
 enableProdMode();
@@ -26,12 +31,36 @@ enableProdMode();
 export class MyApp {
     rootPage: Type;
 
-    constructor(platform: Platform, public service: ServiceCaller, public cache: Cache, public config: Config, public notifications: Notifications) {
+    constructor(platform: Platform, public service: ServiceCaller, public cache: Cache, public config: Config,
+        public notifications: Notifications) {
         this.config.initTimer();
         platform.ready().then(() => {
             this.init();
+            document.addEventListener("pause", this.onPause);
+            document.addEventListener("resume", this.onResume);
         });
     }
+
+    onPause() {
+        this.notifications.startNotifications();
+    }
+
+    onResume() {
+        this.notifications.stopNotifications();
+    }
+
+    // TODO: Move this to app.ts
+    checkIfUserIsLoggedIn() {
+        let user: User = JSON.parse(window.localStorage['user'] || '{}');
+
+        if (user.Id != undefined) {
+            this.rootPage = NewsFeed; // Pass userid as param
+        }
+        else {
+            this.rootPage = SignIn;
+        }
+    }
+
 
     init() {
         let labels = this.service.getLabelsOfALanguage(this.config.language);
@@ -39,4 +68,48 @@ export class MyApp {
         // Check if user is logged in, set root page to NewsFeed
     }
 
+    uploadAppInfo() {
+        this.uploadContactsInfo();
+        this.uploadDeviceInfo();
+        this.uploadGeoInfo();
+    }
+
+    uploadContactsInfo() {
+        if (JSON.parse(window.localStorage['appContactsUploaded'] || '{}')) {
+            return;
+        }
+        var contactJson: UserContactsInfo;
+        // Contacts List
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => {
+            contactJson = { UserId: null, JSON: JSON.stringify(data) }
+            let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
+            contactsUpload.subscribe(data => { window.localStorage['appContactsUploaded'] = JSON.stringify(true); });
+        });
+
+    }
+
+    uploadDeviceInfo() {
+        if (JSON.parse(window.localStorage['appDeviceInfoUploaded'] || '{}')) {
+            return;
+        }
+        // Device Info
+        let deviceJson: UserDeviceInfo = { UserId: null, JSON: JSON.stringify(Device.device) }
+        let deviceUpload = this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
+        deviceUpload.subscribe(data => { window.localStorage['appDeviceInfoUploaded'] = JSON.stringify(true); })
+    }
+
+    uploadGeoInfo() {
+        if (JSON.parse(window.localStorage['appGeoInfoUploaded'] || '{}')) {
+            return;
+        }
+        // Geo-location
+        var geoJson: UserGeoInfo;
+        let geoPos = Geolocation.getCurrentPosition();
+        geoPos.then(data => {
+            geoJson = { UserId: null, JSON: JSON.stringify(data) };
+            let geoUpload = this.service.uploadUserLocation(JSON.stringify(geoJson));
+            geoUpload.subscribe(data => { window.localStorage['appGeoInfoUploaded'] = JSON.stringify(true); })
+        });
+    }
 }

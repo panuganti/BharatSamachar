@@ -8,14 +8,14 @@ import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 
 import {Config} from './config';
 import {Cache} from './cache';
-import {Article, UserNotification, VersionInfo, ConfigData, Stream, CredentialsValidation} from '../contracts/DataContracts';
-import {PostPreview, UnpublishedPost, User, PublishedPost, UserContact} from '../contracts/ServerContracts';
+import {Article, VersionInfo, ConfigData, CredentialsValidation} from '../contracts/DataContracts';
+import {PostPreview, UserNotification, UnpublishedPost, User, PublishedPost, UserContact, Stream} from '../contracts/ServerContracts';
 
 @Injectable()
 export class ServiceCaller {
     url: string = "https://script.google.com/macros/s/AKfycbz2ZMnHuSR4GmTjsuIo6cmh433RRpPRH7TwMaJhbAUr/dev";
-    apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
-    //apiUrl: string = "http://localhost:54909";
+    //apiUrl: string = "http://newsswipesserver20160101.azurewebsites.net";
+    apiUrl: string = "http://localhost:54909";
 
     constructor(public cache: Cache, public http: Http) {
     }
@@ -25,14 +25,20 @@ export class ServiceCaller {
         articles.forEach(article => this.http.get(article.Image));
     }
 
-    checkForNotifications(userId: string) : Observable<any[]> {
-        return this.getRequest<any[]>("/notifications/getNotifications", userId);
+    //#region Notifications
+    checkForNotifications(userId: string) : Observable<UserNotification[]> {
+        return this.getRequest<UserNotification[]>("/notifications/getNotifications", userId);
     }
+
+    clearAllNotifications(userId: string) : Observable<boolean> {
+        return this.getRequest<boolean>("/notifications/clearAllNotifications", userId);
+    }
+    //#endregion Notifications
 
     //#region Feed
 
-    getNewsFeed(streams: string[], skip: number): Observable<PublishedPost[]> {
-        return this.getRequest<PublishedPost[]>("/feed/getfeed/", streams.join(',') + "/" + skip);
+    getNewsFeed(streams: Stream[], skip: number): Observable<PublishedPost[]> {
+        return this.postRequest<PublishedPost[]>("/feed/getfeed/" + skip, JSON.stringify(streams));
     }
 
     getTimeline(userId: string, skip: number): Observable<PublishedPost[]> {
@@ -86,6 +92,10 @@ export class ServiceCaller {
 
     getStreams(userId: string): Observable<Stream[]> {
         return this.getRequest<Stream[]>("/user/GetStreams/", userId);
+    }
+    
+    updateUserStreams(userId: string, streams: Stream[]) : Observable<Stream[]> {
+        return this.postRequest<Stream[]>("/user/UpdateStreams/" + userId, JSON.stringify(streams));
     }
 
     unFollow(userContact: UserContact): Observable<boolean> {

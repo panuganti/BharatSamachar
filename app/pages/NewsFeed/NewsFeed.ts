@@ -3,12 +3,13 @@ import Dictionary = collections.Dictionary;
 
 import {Page, NavController, NavParams, Modal} from 'ionic-angular';
 import {Http, Headers} from 'angular2/http';
+//import {SocialSharing} from 'ionic-native';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
 import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 
-import {PublishedPost} from '../../contracts/ServerContracts';
+import {PublishedPost, Stream} from '../../contracts/ServerContracts';
 import {UserSettings} from '../UserSettings/UserSettings';
 import {ContactsPage} from '../ContactsPage/ContactsPage';
 //import {Notifications} from '../Notifications/Notifications';
@@ -63,7 +64,7 @@ export class NewsFeed {
         this.fetchArticles(this.config.userInfo.Streams);
     }
 
-    fetchArticles(streams: string[]) {
+    fetchArticles(streams: Stream[]) {
         this.service.getNewsFeed(streams, 0)
             .subscribe(articles => this.update(articles));
     }

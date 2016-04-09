@@ -22,6 +22,7 @@ import {Contact} from 'ionic-native/dist/plugins/contacts';
     templateUrl: 'build/pages/SignIn/SignIn.html'
 })
 export class SignIn {
+    loginError: string = '';
     loginMode: boolean = false;
     language: string = "";
     email: string = "";
@@ -37,16 +38,9 @@ export class SignIn {
     contacts: Contact[];
 
     constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller, public notifications: Notifications) {
-        //this.checkIfUserIsLoggedIn();
-        //this.uploadUserAndDeviceInfo();
-        this.sendNotification();
+        this.checkIfUserIsLoggedIn();
     }
-    
-    sendNotification() {
-        this.notifications.sendNotification("Hello World");
-        this.notifications.setBadge(1);
-    }
-
+ 
     // TODO: Move this to app.ts
     checkIfUserIsLoggedIn() {
         let user: User = JSON.parse(window.localStorage['user'] || '{}');
@@ -57,15 +51,15 @@ export class SignIn {
     }
 
     loadUserInfo(userId: string, navigate: boolean) {
-        try {
         let userInfo = this.service.getUserInfo(userId);
         userInfo.subscribe((data) => {
             let firstTime = false; if (data.Language == null) {firstTime = true;}
             this.config.setUserInfo(data); if (navigate) this.navigate(firstTime);});
-        } catch (error) {console.log(error)};
+            //userInfo.catch(e => {console.log(e); return e;});
     }
 
     navigate(firstTime: boolean) {
+        this.uploadUsersDeviceContactGeoInfo();
             this.nav.push(NewsFeed);
     }
 
@@ -106,32 +100,41 @@ export class SignIn {
     }
     
     //#region User Info
-    uploadUserAndDeviceInfo() {
-        var contactJson: UserContactsInfo;
-        var deviceJson: UserDeviceInfo;
-        var geoJson: UserGeoInfo;
-        
+    uploadUsersDeviceContactGeoInfo() {
+        this.uploadContactsList();
+        this.uploadDeviceInfo();
+        this.uploadGeoInfo();
+    }
+    
+    uploadContactsList() {
         // Contacts List
+        var contactJson: UserContactsInfo;
         var contactsList = Contacts.find(['*']);
         contactsList.then(data => { this.contacts = data;
-            contactJson = { UserId: null, JSON: JSON.stringify(data) }
+            contactJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(data) }
             let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
-            contactsUpload.subscribe(data => {console.log(data);});
-             });
-        
+            contactsUpload.subscribe(data => {console.log("contacts updated");});
+             });        
+    }
+    
+    uploadDeviceInfo() {
         // Device Info
-        deviceJson = { UserId: null, JSON: JSON.stringify(Device.device) }
+        var deviceJson: UserDeviceInfo;
+        deviceJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(Device.device) }
         let deviceUpload = this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
-        deviceUpload.subscribe(data => {console.log(data);})
-        
+        deviceUpload.subscribe(data => {console.log("device info updated");})
+     }
+     
+     uploadGeoInfo() {
         // Geo-location
+        var geoJson: UserGeoInfo;
         let geoPos = Geolocation.getCurrentPosition();
         geoPos.then(data =>    {     
-                    geoJson = { UserId: null, JSON: JSON.stringify(data)};
+                    geoJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(data)};
                     let geoUpload = this.service.uploadUserLocation(JSON.stringify(geoJson));
-                    geoUpload.subscribe(data => {console.log(data);})
-        });        
-    }
+                    geoUpload.subscribe(data => {console.log("geo info updated");})
+        });                 
+     }
 
     //#endregion User Info
     

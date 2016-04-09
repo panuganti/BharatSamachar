@@ -54,7 +54,7 @@
         <ion-slide *ngFor="#article of articles; #i = index">
             <ion-card>
                 <div (click)="openFullArticle($event,article.OriginalLink)">
-                    <ion-img src="{{article.ImageUrl}}">
+                    <ion-img src="{{article.ImageUrl}}"> </ion-img>
                     <ion-card-content>
                         <h2> <b>{{article.Heading}} </b> </h2>
                         <br>

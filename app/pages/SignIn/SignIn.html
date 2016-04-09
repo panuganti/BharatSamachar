@@ -46,7 +46,9 @@
         </ion-row>
         <center> {{termsLabel}} </center>
         <br>
-        <b><center *ngIf="error.length > 0" style="color:white">{{error}} </center></b>
+        <ion-item [hidden]="loginError.length == 0">
+            <ion-label assertive>{{loginError}}</ion-label>
+        </ion-item>
     </ion-list>
 </div>
 

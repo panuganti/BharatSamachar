@@ -53,14 +53,6 @@ export interface CredentialsValidation {
     Message: string;
 }
 
-export interface Stream {
-    Text: string;
-    Lang: string;
-    IsAdmin: boolean;
-    UserSelected: boolean;
-    backgroundImageUrl: string;
-}
-
 export interface Entity {
      Id: string;    
  } 

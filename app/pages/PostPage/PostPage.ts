@@ -2,9 +2,10 @@ import { Page, NavParams, NavController, Platform} from 'ionic-angular';
 
 import {ServiceCaller} from '../../providers/servicecaller';
 import {Config} from '../../providers/config';
-import {Article} from '../../contracts/DataContracts';
 
 import {PostPreview, UnpublishedPost, ImageEntity} from '../../contracts/ServerContracts';
+
+import {ContactsPage} from '../ContactsPage/ContactsPage';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
@@ -64,6 +65,10 @@ export class PostPage {
         this.toggleImage = true;         
      }
 
+    
+    
+    
+    
     publish(skip: boolean) {
         let streams: string[] = [];
         let tags: string[] = [];
@@ -173,4 +178,8 @@ export class PostPage {
         }
     }
     //#endregion Image Loaders
+    
+    sendInvitations() {
+        this.nav.push(ContactsPage);
+    }
 }

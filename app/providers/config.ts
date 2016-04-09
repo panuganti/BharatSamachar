@@ -2,8 +2,7 @@
 import Dictionary = collections.Dictionary;
 
 import {Injectable} from 'angular2/core';
-import {Stream} from '../contracts/DataContracts';
-import {User} from '../contracts/ServerContracts';
+import {User, Stream} from '../contracts/ServerContracts';
 import {ServiceCaller} from './servicecaller';
 
 
@@ -12,6 +11,7 @@ export class Config {
     version = "0.0.1";
     
     //#region global variables
+    state: string = 'Active';
     userInfo: User;
     globalTimer: number;
     labels: Dictionary<string, string> = new Dictionary<string, string>();
@@ -21,6 +21,16 @@ export class Config {
     constructor(public service: ServiceCaller) {
         this.setInitialLabels();
     }   
+    
+    setStateToActive() {
+        this.state = 'Active';
+    }
+    
+    setStateToBackground() {
+        this.state = 'Background';        
+    }
+    
+    isActive() : boolean { return this.state == 'Active';}
     
     initTimer() {
         this.globalTimer = new Date().getTime();

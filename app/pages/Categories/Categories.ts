@@ -6,7 +6,7 @@ import {Component} from 'angular2/core';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
 
-import {Stream} from '../../contracts/DataContracts';
+import {Stream} from '../../contracts/ServerContracts';
 import {Config} from '../../providers/config';
 import {ServiceCaller} from '../../providers/servicecaller';
 
@@ -16,7 +16,6 @@ import {ServiceCaller} from '../../providers/servicecaller';
 
 export class Categories {
     streams: Stream[] = [];
-    sectionStreams: Dictionary<string, Stream[]> = new Dictionary<string, Stream[]>();
     doneLabel: string = "Save";
 
     constructor(public config: Config, public nav: NavController,
@@ -26,16 +25,15 @@ export class Categories {
 
     init() {
         let userStreams = this.service.getStreams(this.config.userInfo.Id);
-        userStreams.subscribe(data => { this.streams = data; this.buildSectionStreams(data)})
+        userStreams.subscribe(data => { 
+            Enumerable.From(data).Where(t=> t.Lang == this.config.language).ToArray(); 
+        })
     }
     
-    buildSectionStreams(streams: Stream[]){
-       let sectionStreams = new Dictionary<string, Stream[]>();
-           
-    }    
-
     saveAndGoBack() {
         // write settings to cloud
+        this.service.updateUserStreams(this.config.userInfo.Id, this.streams);
+        this.config.userInfo.Streams = this.streams;
         this.view.dismiss();
     }
 }

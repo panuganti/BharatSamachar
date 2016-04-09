@@ -45,10 +45,34 @@ export class SignIn {
     contacts: Contact[];
 
     constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller, public notifications: Notifications) {
-        this.checkIfUserIsLoggedIn();
+        this.init();
     }
- 
-    // TODO: Move this to app.ts
+    
+    init() {        
+        this.checkConnectionToServer();
+        let labels = this.service.getLabelsOfALanguage(this.config.language);
+        labels.subscribe((data) => { this.cache.setLabels(data); 
+            this.config.printTimeElapsed();}, (err) => { this.pingFailure(err); });
+        this.uploadUserInfo(null);        
+    }  
+      
+    checkConnectionToServer() {
+        let ping = this.service.checkConnection();
+        ping.subscribe(data => {}, err => {this.pingFailure(err);});
+    }
+      
+    //#region Error Handling
+    pingFailure(err: any ) {
+        this.loginError = "Unable to Connect to Server";
+    }
+    //#endregion Error Handling
+      
+    uploadUserInfo(userId: string) {
+        // TODO: Check connection and handle error
+        this.uploadUsersDeviceContactGeoInfo(userId);
+    }
+  
+    /* TODO: Move this to app.ts
     checkIfUserIsLoggedIn() {
         let user: User = JSON.parse(window.localStorage['user'] || '{}');
  
@@ -56,37 +80,38 @@ export class SignIn {
             this.loadUserInfo(user.Id, true);
         }
     }
-
+    */
+    
+    /*
     loadUserInfo(userId: string, navigate: boolean) {
         let userInfo = this.service.getUserInfo(userId);
         userInfo.subscribe((data) => {
             let firstTime = false; if (data.Language == null) {firstTime = true;}
             this.config.setUserInfo(data); if (navigate) this.navigate(firstTime);});
     }
-
-    navigate(firstTime: boolean) {
-        this.uploadUsersDeviceContactGeoInfo();
-            this.nav.push(NewsFeed);
-    }
+*/
 
     login() {
         let validation = this.service.validateCredentials(this.email, this.password);
-        validation.subscribe(data => {let firstTime = false; if (data.Language == null) {firstTime = true;} 
-                    this.storeCredAndGoToHome(data, firstTime); });
+        validation.subscribe(data => { this.storeCredAndGoToHome(data); }, err => this.handleloginError(err));
 
     }
 
-    storeCredAndGoToHome(user: User, firstTime: boolean) {
-        window.localStorage['user'] = JSON.stringify(user);
-        this.config.setUserInfo(user);
-        this.navigate(firstTime);
+    storeCredAndGoToHome(user: User) {
+        window.localStorage['userId'] = JSON.stringify(user.Id);
+        //this.config.setUserInfo(user);
+        this.uploadUserInfo(user.Id);
+        this.nav.push(NewsFeed);
     }
 
     signup() {
         let signup = this.service.signUp(this.email, this.password, this.language);
-        signup.subscribe(data => this.storeCredAndGoToHome(data, true));
-        signup.catch(e => {console.log("caught you"); console.log(e); return e;});
+        signup.subscribe(data => this.storeCredAndGoToHome(data), err => this.handleloginError(err));
     }
+
+    handleloginError(err: any) {
+        this.loginError = JSON.parse(err._body).ExceptionMessage;
+    }    
 
     loadLabels() {
         try {
@@ -104,37 +129,37 @@ export class SignIn {
     }
     
     //#region User Info
-    uploadUsersDeviceContactGeoInfo() {
-        this.uploadContactsList();
-        this.uploadDeviceInfo();
-        this.uploadGeoInfo();
+    uploadUsersDeviceContactGeoInfo(userId: string) {
+        this.uploadContactsList(userId);
+        this.uploadDeviceInfo(userId);
+        this.uploadGeoInfo(userId);
     }
     
-    uploadContactsList() {
+    uploadContactsList(userId: string) {
         // Contacts List
         var contactJson: UserContactsInfo;
         var contactsList = Contacts.find(['*']);
         contactsList.then(data => { this.contacts = data;
-            contactJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(data) }
+            contactJson = { UserId: userId, JSON: JSON.stringify(data) }
             let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
             contactsUpload.subscribe(data => {console.log("contacts updated");});
              });        
     }
     
-    uploadDeviceInfo() {
+    uploadDeviceInfo(userId: string) {
         // Device Info
         var deviceJson: UserDeviceInfo;
-        deviceJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(Device.device) }
+        deviceJson = { UserId: userId, JSON: JSON.stringify(Device.device) }
         let deviceUpload = this.service.uploadDeviceInfo(JSON.stringify(deviceJson));
         deviceUpload.subscribe(data => {console.log("device info updated");})
      }
      
-     uploadGeoInfo() {
+     uploadGeoInfo(userId: string) {
         // Geo-location
         var geoJson: UserGeoInfo;
         let geoPos = Geolocation.getCurrentPosition();
         geoPos.then(data =>    {     
-                    geoJson = { UserId: this.config.userInfo.Id, JSON: JSON.stringify(data)};
+                    geoJson = { UserId: userId, JSON: JSON.stringify(data)};
                     let geoUpload = this.service.uploadUserLocation(JSON.stringify(geoJson));
                     geoUpload.subscribe(data => {console.log("geo info updated");})
         });                 

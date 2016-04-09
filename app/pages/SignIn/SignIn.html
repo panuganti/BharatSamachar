@@ -17,6 +17,9 @@
 
 <div id="polina">
     <ion-list>
+        <ion-item [hidden]="loginError.length == 0">
+            <ion-label style="color:red"><center>{{loginError}}</center></ion-label>
+        </ion-item>
         <ion-item>
             <ion-label floating>{{emailLabel}}</ion-label>
             <ion-input type="text" [(ngModel)]="email" required></ion-input>
@@ -45,10 +48,6 @@
             </ion-col>
         </ion-row>
         <center> {{termsLabel}} </center>
-        <br>
-        <ion-item [hidden]="loginError.length == 0">
-            <ion-label assertive>{{loginError}}</ion-label>
-        </ion-item>
     </ion-list>
 </div>
 

@@ -34,6 +34,15 @@ export class Config {
     
     initTimer() {
         this.globalTimer = new Date().getTime();
+        console.log("timer started");
+    }
+
+    getTimeElapsed() : number {
+        return new Date().getTime() - this.globalTimer;
+    }
+    
+    printTimeElapsed() {
+        console.log("Time: " + (new Date().getTime() - this.globalTimer) + "ms");
     }
 
     setUserInfo(user: User) {

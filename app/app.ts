@@ -32,42 +32,36 @@ export class MyApp {
     rootPage: Type;
 
     constructor(platform: Platform, public service: ServiceCaller, public cache: Cache, public config: Config,
-        public notifications: Notifications) {
+        public notifications: Notifications) {        
         this.config.initTimer();
-        platform.ready().then(() => {
-            this.init();
-            document.addEventListener("pause", this.onPause);
-            document.addEventListener("resume", this.onResume);
-        });
+        this.init();
     }
 
-    onPause() {
-        this.notifications.startNotifications();
-    }
-
-    onResume() {
-        this.notifications.stopNotifications();
-    }
-
-    // TODO: Move this to app.ts
-    checkIfUserIsLoggedIn() {
-        let user: User = JSON.parse(window.localStorage['user'] || '{}');
-
-        if (user.Id != undefined) {
-            this.rootPage = NewsFeed; // Pass userid as param
+       
+   init() {
+        let isSignedIn = this.checkIfUserIsLoggedIn();
+        if (isSignedIn) {
+            this.rootPage = NewsFeed;
         }
         else {
             this.rootPage = SignIn;
         }
     }
 
+    // TODO: Move this to app.ts
+    checkIfUserIsLoggedIn() : boolean {
+        let userId: string = JSON.parse(window.localStorage['userId'] || '{}');
+        return userId != undefined && userId.length > 0; 
+    }
 
+    /*
     init() {
         let labels = this.service.getLabelsOfALanguage(this.config.language);
         labels.subscribe((data) => { this.cache.setLabels(data); this.rootPage = SignIn; }, (err) => { console.log(err); this.rootPage = SignIn; });
-        // Check if user is logged in, set root page to NewsFeed
     }
+    */
 
+    /*    
     uploadAppInfo() {
         this.uploadContactsInfo();
         this.uploadDeviceInfo();
@@ -112,4 +106,5 @@ export class MyApp {
             geoUpload.subscribe(data => { window.localStorage['appGeoInfoUploaded'] = JSON.stringify(true); })
         });
     }
+    */
 }

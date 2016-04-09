@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/tsd.d.ts" />
 import Dictionary = collections.Dictionary;
 
-import {Page, NavController, NavParams, Modal} from 'ionic-angular';
+import {Page, NavController, NavParams, Modal, Platform} from 'ionic-angular';
 import {Http, Headers} from 'angular2/http';
 //import {SocialSharing} from 'ionic-native';
 
@@ -15,6 +15,7 @@ import {ContactsPage} from '../ContactsPage/ContactsPage';
 //import {Notifications} from '../Notifications/Notifications';
 import {FullArticle} from '../FullArticle/FullArticle';
 import {PostPage} from '../PostPage/PostPage';
+import {SignIn} from '../SignIn/SignIn';
 
 import {Categories} from '../Categories/Categories';
 import {Config} from '../../providers/config';
@@ -41,15 +42,43 @@ export class NewsFeed {
         onInit: (slides: any) => { this.swiper = slides; this.refresh(); }
     };
 
-    constructor(public http: Http, public nav: NavController, public navParams: NavParams,
-        public config: Config, public service: ServiceCaller, public notifications: Notifications) {
-            
+    constructor(public http: Http, public platform: Platform, public nav: NavController, public navParams: NavParams,
+            public config: Config, public service: ServiceCaller, public notifications: Notifications) {
+            this.init();    
     }
-    
+
+    init() {
+        let userId = JSON.parse(window.localStorage['userId']); 
+        if (userId == undefined || userId.length == 0) {
+            this.nav.push(SignIn); // TODO: Change this to setting root
+        }         
+        this.subscribeToNotifications();
+    }
+
+    //#region Notifications
+    subscribeToNotifications() {
+        this.platform.ready().then(() => {
+            console.log("platform ready"); this.config.printTimeElapsed();
+            document.addEventListener("pause", this.onPause);
+            document.addEventListener("resume", this.onResume);
+        });
+    }
+
+    onPause() {
+        this.notifications.startNotifications();
+    }
+
+    onResume() {
+        this.notifications.stopNotifications();
+    }
+
+
     sendNotifiation() {
         this.notifications.sendNotification("Hello World 2");
         this.notifications.setBadge(2);
     }
+
+    //#endregion Notifications
 
     onPageWillEnter() {
         this.refresh();

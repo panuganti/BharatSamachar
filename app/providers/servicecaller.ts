@@ -20,6 +20,12 @@ export class ServiceCaller {
     constructor(public cache: Cache, public http: Http) {
     }
 
+    //#region Connection 
+    checkConnection() : Observable<string> {
+        return this.getRequest<string>("/config/CheckConnection/", "hello world");
+    }
+    //#endregion Connection 
+
     // TODO: Move to Cache
     prefetchImages(articles: Article[]) {
         articles.forEach(article => this.http.get(article.Image));
@@ -27,11 +33,11 @@ export class ServiceCaller {
 
     //#region Notifications
     checkForNotifications(userId: string) : Observable<UserNotification[]> {
-        return this.getRequest<UserNotification[]>("/notifications/getNotifications", userId);
+        return this.getRequest<UserNotification[]>("/notifications/getNotifications/", userId);
     }
 
     clearAllNotifications(userId: string) : Observable<boolean> {
-        return this.getRequest<boolean>("/notifications/clearAllNotifications", userId);
+        return this.getRequest<boolean>("/notifications/clearAllNotifications/", userId);
     }
     //#endregion Notifications
 
@@ -75,7 +81,7 @@ export class ServiceCaller {
             Password: password,
             Language: language
         }
-        return this.postRequest<User>("/user/SignUp", JSON.stringify(credentials));
+        return this.postRequest<User>("/user/SignUp", JSON.stringify(credentials), 0);
     }
 
     validateCredentials(email: string, password: string): Observable<User> {
@@ -83,7 +89,7 @@ export class ServiceCaller {
             Email: email,
             Password: password
         };
-        return this.postRequest<User>("/user/ValidateCredentials", JSON.stringify(credentials));
+        return this.postRequest<User>("/user/ValidateCredentials", JSON.stringify(credentials), 0);
     }
 
     checkIfEmailExists(email: string): Observable<boolean> {
@@ -160,17 +166,17 @@ export class ServiceCaller {
     //#endregion Upload UserInfo
     
     //#region private methods
-    getRequest<T>(route: string, request: string) : Observable<T> {
+    getRequest<T>(route: string, request: string, retryCount: number = 2) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        return this.http.get(this.apiUrl + route + request, { headers: headers }).retry(3).map(res => res.json());                        
+        return this.http.get(this.apiUrl + route + request, { headers: headers }).retry(retryCount).map(res => res.json());                        
     }
     
-    postRequest<T>(route: string, jsonString: string) : Observable<T> {
+    postRequest<T>(route: string, jsonString: string, retryCount: number = 2) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http.post(this.apiUrl + route,
-            jsonString, { headers: headers }).retry(3).map(res => res.json());
+            jsonString, { headers: headers }).retry(retryCount).map(res => res.json());
     }
     //#endregion private methods
 }

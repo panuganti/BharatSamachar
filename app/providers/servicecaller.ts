@@ -22,7 +22,7 @@ export class ServiceCaller {
 
     //#region Connection 
     checkConnection() : Observable<string> {
-        return this.getRequest<string>("/config/CheckConnection/", "hello world");
+        return this.getRequest<string>("/config/CheckConnection/", "hello world", 1);
     }
     //#endregion Connection 
 

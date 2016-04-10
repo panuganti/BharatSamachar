@@ -50,15 +50,15 @@ export class SignIn {
     
     init() {        
         this.checkConnectionToServer();
-        let labels = this.service.getLabelsOfALanguage(this.config.language);
-        labels.subscribe((data) => { this.cache.setLabels(data); 
-            this.config.printTimeElapsed();}, (err) => { this.pingFailure(err); });
-        this.uploadUserInfo(null);        
     }  
       
     checkConnectionToServer() {
         let ping = this.service.checkConnection();
+        let labels = this.service.getLabelsOfALanguage(this.config.language);
         ping.subscribe(data => {}, err => {this.pingFailure(err);});
+        labels.subscribe((data) => { this.cache.setLabels(data); 
+            this.config.printTimeElapsed();}, (err) => { this.pingFailure(err); });
+        this.uploadUserInfo(null);        
     }
       
     //#region Error Handling

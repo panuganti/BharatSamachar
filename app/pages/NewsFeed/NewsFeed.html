@@ -1,5 +1,5 @@
-<ion-navbar *navbar hideBackButton class="show-navbar android-attr">
-    <ion-buttons center>
+<ion-navbar *navbar hideBackButton class="show-navbar android-attr navbar">
+    <ion-buttons center class="navbar">
         <ion-row>
             <ion-col>
                 <button (click)="refresh()">
@@ -43,18 +43,28 @@
 </ion-navbar>
 
 <ion-content class="has-header components-demo cards-bg social-cards newsfeed" [style.background]="backgroundImageUrl">
+<!--
     <ion-refresher pulling-text="Pull to refresh..." (refresh)="refresh()">
         <ion-refresher-content pullingIcon="arrow-dropdown"> </ion-refresher-content>
     </ion-refresher>
     <ion-infinite-scroll *ngIf="moreDataCanBeLoaded()" spinner="lines" (infinite)="loadMore($event)" distance="5%">
-        <ion-infinite-scroll-content loadingSpinner="bubbles" + loadingText="Loading more news...">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more news...">
         </ion-infinite-scroll-content>
     </ion-infinite-scroll>
-    <ion-slides [options]="options">
+-->
+    <ion-list>
+        <ion-item [hidden]="newsFeedError.length == 0">
+            <ion-label style="color:red">
+                <center>{{newsFeedError}}</center>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <ion-slides [options]="options" [hidden]="newsFeedError.length > 0">
         <ion-slide *ngFor="#article of articles; #i = index">
             <ion-card>
                 <div (click)="openFullArticle($event,article.OriginalLink)">
-                    <ion-img src="{{article.ImageUrl}}"> </ion-img>
+                    <img src="{{article.ImageUrl}}"> 
                     <ion-card-content>
                         <h2> <b>{{article.Heading}} </b> </h2>
                         <br>
@@ -63,13 +73,13 @@
                 </div>
                 <ion-row>
                     <ion-col>
-                        <ion-icon [hidden]="contains(article.LikedBy,config.userInfo.Id)" (click)="addLike(article)" name='ios-thumbs-up-outline'></ion-icon>
-                        <ion-icon [hidden]="!contains(article.LikedBy,config.userInfo.Id)" (click)="removeLike(article)" name='thumbs-up'></ion-icon>
+                        <ion-icon [hidden]="contains(article.LikedBy,userId)" (click)="addLike(article)" name='ios-thumbs-up-outline'></ion-icon>
+                        <ion-icon [hidden]="!contains(article.LikedBy,userId)" (click)="removeLike(article)" name='thumbs-up'></ion-icon>
                         {{article.LikedBy.length}}
                     </ion-col>
                     <ion-col>
-                        <ion-icon [hidden]="contains(article.SharedBy,config.userInfo.Id)" (click)="reTweet(article)" name='ios-repeat'></ion-icon>
-                        <ion-icon [hidden]="!contains(article.SharedBy,config.userInfo.Id)" (click)="undoReTweet(article)" name='md-repeat'></ion-icon>
+                        <ion-icon [hidden]="contains(article.SharedBy,userId)" (click)="reTweet(article)" name='ios-repeat'></ion-icon>
+                        <ion-icon [hidden]="!contains(article.SharedBy,userId)" (click)="undoReTweet(article)" name='md-repeat'></ion-icon>
                         {{article.SharedBy.length}}
                     </ion-col>
                     <!--
@@ -94,5 +104,9 @@
         background-size: cover !important;
         background-repeat: no-repeat !important;
         background-position: 50% 50%;
+    }
+    
+    .navbar {
+        background-color: white !important;
     }
 </style>

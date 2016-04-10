@@ -10,11 +10,14 @@ import {Stream} from '../../contracts/ServerContracts';
 import {Config} from '../../providers/config';
 import {ServiceCaller} from '../../providers/servicecaller';
 
+import {SignIn} from '../SignIn/SignIn';
+
 @Page({
     templateUrl: 'build/pages/Categories/Categories.html'
 })
 
 export class Categories {
+    userId: string = '';
     streams: Stream[] = [];
     doneLabel: string = "Save";
 
@@ -24,16 +27,19 @@ export class Categories {
     }
 
     init() {
-        let userStreams = this.service.getStreams(this.config.userInfo.Id);
-        userStreams.subscribe(data => { 
-            Enumerable.From(data).Where(t=> t.Lang == this.config.language).ToArray(); 
+        this.userId = JSON.parse(window.localStorage['userId']); 
+        if (this.userId == undefined || this.userId.length == 0) {
+            this.nav.push(SignIn); // TODO: Change this to setting root
+        }         
+
+        let userStreams = this.service.getStreams(this.userId);
+        userStreams.subscribe(data => { this.streams = data; 
         })
     }
     
     saveAndGoBack() {
         // write settings to cloud
-        this.service.updateUserStreams(this.config.userInfo.Id, this.streams);
-        this.config.userInfo.Streams = this.streams;
+        this.service.updateUserStreams(this.userId, this.streams);
         this.view.dismiss();
     }
 }

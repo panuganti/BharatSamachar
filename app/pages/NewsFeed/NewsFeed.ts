@@ -28,6 +28,9 @@ import {Notifications} from '../../providers/notifications';
 })
 
 export class NewsFeed {
+    userId: string = '';
+    skip: number = 0;
+    newsFeedError: string = '';
     articles: PublishedPost[] = [];
     homeBadgeNumber: number = 0;
     notificationBadgeNumber: number = 0;
@@ -48,8 +51,8 @@ export class NewsFeed {
     }
 
     init() {
-        let userId = JSON.parse(window.localStorage['userId']); 
-        if (userId == undefined || userId.length == 0) {
+        this.userId = JSON.parse(window.localStorage['userId']); 
+        if (this.userId == undefined || this.userId.length == 0) {
             this.nav.push(SignIn); // TODO: Change this to setting root
         }         
         this.subscribeToNotifications();
@@ -58,7 +61,7 @@ export class NewsFeed {
     //#region Notifications
     subscribeToNotifications() {
         this.platform.ready().then(() => {
-            console.log("platform ready"); this.config.printTimeElapsed();
+            this.config.printTimeElapsed();
             document.addEventListener("pause", this.onPause);
             document.addEventListener("resume", this.onResume);
         });
@@ -77,7 +80,6 @@ export class NewsFeed {
         this.notifications.sendNotification("Hello World 2");
         this.notifications.setBadge(2);
     }
-
     //#endregion Notifications
 
     onPageWillEnter() {
@@ -89,24 +91,38 @@ export class NewsFeed {
     }
 
     refresh() {
-        this.swiper.slideTo(0, 100, true); // Note: see api
-        this.fetchArticles(this.config.userInfo.Streams);
+        this.config.printTimeElapsed();
+        this.swiper.slideTo(0, 100, true);
+        let streamsOb = this.service.getStreams(this.userId);
+        streamsOb.subscribe(streams => this.fetchArticles(streams), 
+                                    err => {this.handleError(err)});
+        this.skip = 0;
+    }
+    
+    handleError(err: any) {
+        this.newsFeedError = JSON.parse(err._body).ExceptionMessage;   
     }
 
     fetchArticles(streams: Stream[]) {
-        this.service.getNewsFeed(streams, 0)
-            .subscribe(articles => this.update(articles));
+        this.config.printTimeElapsed();
+        let feedStreams = Enumerable.From(streams).Where(s => s.UserSelected).ToArray();
+        this.service.getNewsFeed(feedStreams, 0)
+                .subscribe(articles => {this.update(articles); },
+                           err => {this.handleError(err)});
     }
 
+    /*
     moreDataCanBeLoaded() {
-        //return true;
+        return true;
     }
 
     loadMore($event: any) {
         console.log("infile scroll to load more triggered");
     }
-
+    */
+    
     update(art: PublishedPost[]) {
+        this.config.printTimeElapsed();
         this.articles = art.slice();
     }
 

@@ -22,7 +22,6 @@
             <ion-item-options>
                 <button [hidden]="!item.isOnNetwork || item.isFollowing" (click)="unFollow(item)">UnFollow</button>
                 <button [hidden]="item.isOnNetwork && item.Phone.length==0" (click)="inviteBySMS(item)">SMS</button>
-                <button [hidden]="item.isOnNetwork && item.Email.length==0" (click)="inviteByMail(item)">Email</button>
                 <button (click)="delete(item)">Delete</button>
             </ion-item-options>
         </ion-item-sliding>

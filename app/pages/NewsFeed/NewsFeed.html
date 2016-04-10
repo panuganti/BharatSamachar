@@ -29,7 +29,7 @@
             </ion-col>
 
             <ion-col>
-                <button (click)="showContacts()">
+                <button (click)="showContacts()" [disabled]="!isContactsLoaded">
                     <ion-icon name="ios-contacts-outline"></ion-icon>
                 </button>
             </ion-col>
@@ -52,15 +52,8 @@
         </ion-infinite-scroll-content>
     </ion-infinite-scroll>
 -->
-    <ion-list>
-        <ion-item [hidden]="newsFeedError.length == 0">
-            <ion-label style="color:red">
-                <center>{{newsFeedError}}</center>
-            </ion-label>
-        </ion-item>
-    </ion-list>
 
-    <ion-slides [options]="options" [hidden]="newsFeedError.length > 0">
+    <ion-slides [options]="options" >
         <ion-slide *ngFor="#article of articles; #i = index">
             <ion-card>
                 <div (click)="openFullArticle($event,article.OriginalLink)">
@@ -73,8 +66,8 @@
                 </div>
                 <ion-row>
                     <ion-col>
-                        <ion-icon [hidden]="contains(article.LikedBy,userId)" (click)="addLike(article)" name='ios-thumbs-up-outline'></ion-icon>
-                        <ion-icon [hidden]="!contains(article.LikedBy,userId)" (click)="removeLike(article)" name='thumbs-up'></ion-icon>
+                        <ion-icon [hidden]="contains(article.LikedBy,userId)" (click)="addLike(article, userId)" name='ios-thumbs-up-outline'></ion-icon>
+                        <ion-icon [hidden]="!contains(article.LikedBy,userId)" (click)="removeLike(article, userId)" name='thumbs-up'></ion-icon>
                         {{article.LikedBy.length}}
                     </ion-col>
                     <ion-col>

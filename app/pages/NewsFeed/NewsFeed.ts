@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/tsd.d.ts" />
 import Dictionary = collections.Dictionary;
 
-import {Page, NavController, NavParams, Modal, Platform} from 'ionic-angular';
+import {Page, NavController, NavParams, Modal, Platform, Alert} from 'ionic-angular';
 import {Http, Headers} from 'angular2/http';
 //import {SocialSharing} from 'ionic-native';
 
@@ -9,9 +9,11 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
 import 'rxjs/add/observable/fromArray'; // required for Observable.of();
 
-import {PublishedPost, Stream} from '../../contracts/ServerContracts';
+import {PublishedPost, Stream, UserContactsInfo, UserContact} from '../../contracts/ServerContracts';
 import {UserSettings} from '../UserSettings/UserSettings';
 import {ContactsPage} from '../ContactsPage/ContactsPage';
+import {Contacts} from 'ionic-native';
+import {Contact} from 'ionic-native/dist/plugins/contacts';
 //import {Notifications} from '../Notifications/Notifications';
 import {FullArticle} from '../FullArticle/FullArticle';
 import {PostPage} from '../PostPage/PostPage';
@@ -29,6 +31,7 @@ import {Notifications} from '../../providers/notifications';
 
 export class NewsFeed {
     userId: string = '';
+    isContactsLoaded: boolean = false;
     skip: number = 0;
     newsFeedError: string = '';
     articles: PublishedPost[] = [];
@@ -42,7 +45,8 @@ export class NewsFeed {
         keyboardControl: true,
         mousewheelControl: true,
         onlyExternal: false,
-        onInit: (slides: any) => { this.swiper = slides; this.refresh(); }
+        onInit: (slides: any) => { this.swiper = slides; this.refresh(); },
+        onSlideChangeStart: (slides: any) => { this.slideChanged();},
     };
 
     constructor(public http: Http, public platform: Platform, public nav: NavController, public navParams: NavParams,
@@ -57,7 +61,7 @@ export class NewsFeed {
         }         
         this.subscribeToNotifications();
     }
-
+    
     //#region Notifications
     subscribeToNotifications() {
         this.platform.ready().then(() => {
@@ -68,17 +72,11 @@ export class NewsFeed {
     }
 
     onPause() {
-        this.notifications.startNotifications();
+        this.notifications.startNotifications(this.userId);
     }
 
     onResume() {
-        this.notifications.stopNotifications();
-    }
-
-
-    sendNotifiation() {
-        this.notifications.sendNotification("Hello World 2");
-        this.notifications.setBadge(2);
+        this.notifications.stopNotifications(this.userId);
     }
     //#endregion Notifications
 
@@ -91,23 +89,24 @@ export class NewsFeed {
     }
 
     refresh() {
+        this.newsFeedError = '';
         this.config.printTimeElapsed();
         this.swiper.slideTo(0, 100, true);
         let streamsOb = this.service.getStreams(this.userId);
-        streamsOb.subscribe(streams => this.fetchArticles(streams), 
+        streamsOb.subscribe(streams => this.fetchArticles(streams, 0), 
                                     err => {this.handleError(err)});
         this.skip = 0;
     }
     
     handleError(err: any) {
         this.newsFeedError = JSON.parse(err._body).ExceptionMessage;   
+        let alert = Alert.create({title: 'Problem!', subTitle: this.newsFeedError, buttons:['OK']});
+        this.nav.present(alert);
     }
 
-    fetchArticles(streams: Stream[]) {
-        this.config.printTimeElapsed();
-        let feedStreams = Enumerable.From(streams).Where(s => s.UserSelected).ToArray();
-        this.service.getNewsFeed(feedStreams, 0)
-                .subscribe(articles => {this.update(articles); },
+    fetchArticles(streams: Stream[], skip: number) {
+        this.service.getNewsFeed(this.userId, skip)
+                .subscribe(articles => {this.update(articles, skip); },
                            err => {this.handleError(err)});
     }
 
@@ -121,48 +120,107 @@ export class NewsFeed {
     }
     */
     
-    update(art: PublishedPost[]) {
+    update(art: PublishedPost[], skip: number) {
         this.config.printTimeElapsed();
-        this.articles = art.slice();
+        if (skip == 0) {
+            this.articles = art.slice();
+        } else {
+            this.articles.concat(art.slice()); // TODO: Test
+        }
     }
 
     //#region Utils
     contains(array: any[], value: any): boolean {
+        return Enumerable.From(array).Contains(value);
+        /*
         for (var elem of array) {
             if (elem === value) { return true; }
         }
-        return false;
+        return false; 
+        */
     }
     //#endregion Utils
 
     //#region User Reaction
-    addLike(article: PublishedPost) {
-        var likes = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'Like');
+    slideChanged() {
+        let slideNo = this.swiper.activeIndex;
+        let totalSlides = this.articles.length;
+        if (totalSlides > 0 && totalSlides -slideNo < 5 )
+        {
+            // fetch next set of articles
+        }
+    }
+    
+    addLike(article: PublishedPost, userId: string) {
+        var likes = this.service.sendUserReaction(article.Id, userId, 'Like');
         likes.subscribe(data => { article.LikedBy = data; });
     }
 
-    removeLike(article: PublishedPost) {
-        var likes = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'UnLike');
+    removeLike(article: PublishedPost, userId: string) {
+        var likes = this.service.sendUserReaction(article.Id, userId, 'UnLike');
         likes.subscribe(data => { article.LikedBy = data; });
     }
 
-    reTweet(article: PublishedPost) {
-        var shares = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'ReTweet');
+    reTweet(article: PublishedPost, userId: string) {
+        var shares = this.service.sendUserReaction(article.Id, userId, 'ReTweet');
         shares.subscribe(data => { article.SharedBy = data; });
     }
 
-    undoReTweet(article: PublishedPost) {
-        var shares = this.service.sendUserReaction(article.Id, this.config.userInfo.Id, 'UnReTweet');
+    undoReTweet(article: PublishedPost, userId: string) {
+        var shares = this.service.sendUserReaction(article.Id, userId, 'UnReTweet');
         shares.subscribe(data => { article.SharedBy = data; });
     }
     //#endregion User Reaction
 
-    //#region Modals 
+    //#region Contacts`
     showContacts() {
         this.nav.push(ContactsPage);
     }
+    
+    loadContacts(refresh: boolean = false) {
+         let contacts: Contact[] = JSON.parse(window.localStorage['contacts'] || '{}');
+         let contactsFromServer = this.service.fetchContacts(this.userId);
+        if (contacts != undefined || contacts.length == 0) {
+            this.isContactsLoaded = true;
+        }
+        else {
+            contactsFromServer.subscribe(data => { if (data.length == 0) {
+                this.refreshContacts();
+            }
+            else {
+                window.localStorage['contacts'] = JSON.stringify(data)
+                this.isContactsLoaded = true;
+            }
+        });
+        }
+    }
+    
+    refreshContacts() {
+        var contactJson: UserContactsInfo;
+        let contacts: UserContact[] = [];
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => { 
+            contacts = Enumerable.From(data).Select(c => {
+            let contact: UserContact = {
+                profileImg: '',
+                Name: '',
+                isOnNetwork: false,
+                isFollowing: true,
+                Phone: '',
+                Email: ''                
+            };                
+            return contact;}).ToArray();
+            let jsonArray = JSON.stringify(contacts);
+            window.localStorage['contacts'] = jsonArray; 
+            this.isContactsLoaded = true;
+            contactJson = { UserId: this.userId, JSON: jsonArray }
+            let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
+            contactsUpload.subscribe(data => {console.log("contacts updated");});            
+                });
+    }
+    //#region Contacts`
 
-
+    //#region Modals 
     openFullArticle(event: any, source: string) {
         var params = { src: source };
         let fullArticleModal = Modal.create(FullArticle, params);

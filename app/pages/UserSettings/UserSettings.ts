@@ -12,7 +12,7 @@ import {Type} from 'angular2/core';
 })
 export class UserSettings {             
     settingsLabel: string = "Settings";
-    doneLabel: string = "Save";
+    doneLabel: string = "Close";
     signOutLabel: string = "Sign Out";      
           
     rootPage: Type;

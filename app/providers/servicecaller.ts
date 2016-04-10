@@ -32,8 +32,8 @@ export class ServiceCaller {
     }
 
     //#region Notifications
-    checkForNotifications(userId: string) : Observable<UserNotification[]> {
-        return this.getRequest<UserNotification[]>("/notifications/getNotifications/", userId);
+    checkForNotifications(userId: string) : Observable<UserNotification> {
+        return this.getRequest<UserNotification>("/notifications/getNotifications/", userId);
     }
 
     clearAllNotifications(userId: string) : Observable<boolean> {
@@ -43,8 +43,8 @@ export class ServiceCaller {
 
     //#region Feed
 
-    getNewsFeed(streams: Stream[], skip: number): Observable<PublishedPost[]> {
-        return this.postRequest<PublishedPost[]>("/feed/getfeed/" + skip, JSON.stringify(streams));
+    getNewsFeed(userId: string, skip: number): Observable<PublishedPost[]> {
+        return this.getRequest<PublishedPost[]>("/feed/getfeed/", userId + "/" + skip);
     }
 
     getTimeline(userId: string, skip: number): Observable<PublishedPost[]> {

@@ -20,7 +20,8 @@ import 'rxjs/add/operator/retry';
     templateUrl: 'build/pages/ContactsPage/ContactsPage.html'
 })
 export class ContactsPage {
-    contacts: Contact[] = [];
+    contacts: UserContact[] = [];
+    userId: string = '';
     notifications: UserNotification[] = [];
     doneLabel: string = 'Done';
     contactsJsonFile: string = 'resources/contacts.json';
@@ -31,7 +32,8 @@ export class ContactsPage {
     defaultSMSMessage: string = 'Hey, Check out this app';
 
     constructor(public config: Config, public service: ServiceCaller, public nav: NavController, public platform: Platform, public http: Http) {
-        this.loadContactsFromFile();
+        //this.loadContactsFromFile();
+        this.loadContacts();
     }
 
     // TODO: Delete .. Fetch from local store or remote
@@ -40,19 +42,52 @@ export class ContactsPage {
         .subscribe(data => { this.filterContacts(data) });
     }
 
-    fetchContacts(userId: string) {
-        let contacts = this.service.fetchContacts(userId);
-        contacts.subscribe(data => this.filterContacts(data));
-    }
-
+    // TODO: There should be no need to filter again
     filterContacts(data: UserContact[]) {
          this.userContacts = Enumerable.From(data).OrderBy(elem => elem.Name).ToArray();
     }
 
-    loadContacts() {
-        var contactsList = Contacts.find(['*']);
-        contactsList.then(data => { this.contacts = data; });
+    //#region Contacts`
+    showContacts() {
+        this.nav.push(ContactsPage);
     }
+    
+    loadContacts(refresh: boolean = false) {
+         this.userId = JSON.parse(window.localStorage['userId'] || '{}');
+         if (this.userId == undefined || this.userId.length == 0) { this.nav.pop();}
+
+         this.contacts = JSON.parse(window.localStorage['contacts'] || '{}');
+        if (this.contacts != undefined || this.contacts.length == 0) {
+            //let contactsFromServer = this.service.fetchContacts(userId);
+            this.nav.pop();
+        }
+    }
+
+/*    
+    refreshContacts() {
+        var contactJson: UserContactsInfo;
+        let contacts: UserContact[] = [];
+        var contactsList = Contacts.find(['*']);
+        contactsList.then(data => { 
+            contacts = Enumerable.From(data).Select(c => {
+            let contact: UserContact = {
+                profileImg: '',
+                Name: '',
+                isOnNetwork: false,
+                isFollowing: true,
+                Phone: '',
+                Email: ''                
+            };                
+            return contact;}).ToArray();
+            let jsonArray = JSON.stringify(contacts);
+            window.localStorage['contacts'] = jsonArray; 
+            contactJson = { UserId: this.userId, JSON: jsonArray }
+            let contactsUpload = this.service.uploadContactsList(JSON.stringify(contactJson));
+            contactsUpload.subscribe(data => {console.log("contacts updated");});            
+                });
+    }
+    */
+    //#region Contacts`
 
     saveAndGoBack() {
         // write settings to cloud       
@@ -70,11 +105,14 @@ export class ContactsPage {
     }
 
     unFollow(contact: UserContact) {
+        let index = this.contacts.indexOf(contact);
+        this.contacts[index].isFollowing = false;
+        window.localStorage['contacts'] = JSON.stringify(this.contacts); // TODO: Instead fetch from server and write to local storage
         this.service.unFollow(contact).subscribe(data => { console.log(data);});
     }
 
     inviteBySMS(contact: UserContact) {
-        SMS.send(contact.Phone, "Hey, Check out this ")
+        SMS.send(contact.Phone, "Hey, Check out this"); // TODO
     }
 
     inviteByMail(contact: UserContact) {
@@ -82,6 +120,10 @@ export class ContactsPage {
     }
 
     deleteContact(contact: UserContact) {
+        // TODO: Also delete in local storage
+        let index = this.contacts.indexOf(contact);
+        if (index > -1) { this.contacts.splice(index, 1); }
+        window.localStorage['contacts'] = JSON.stringify(this.contacts);
         this.service.deleteContact(contact).subscribe(data => {console.log(data);});
     }
     //#endregion Friend Functions

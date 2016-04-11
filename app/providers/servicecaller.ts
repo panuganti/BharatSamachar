@@ -19,6 +19,7 @@ export class ServiceCaller {
 
     constructor(public cache: Cache, public http: Http) {
     }
+  
 
     //#region Connection 
     checkConnection() : Observable<string> {
@@ -27,8 +28,8 @@ export class ServiceCaller {
     //#endregion Connection 
 
     // TODO: Move to Cache
-    prefetchImages(articles: Article[]) {
-        articles.forEach(article => this.http.get(article.Image));
+    prefetchImages(posts: PublishedPost[]) {
+        posts.forEach(article => this.http.get(article.ImageUrl).subscribe(data => {}));
     }
 
     //#region Notifications

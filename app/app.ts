@@ -17,7 +17,7 @@ import {Notifications} from './providers/notifications';
 import {Cache} from './providers/cache';
 
 
-import {User, UserContactsInfo, UserDeviceInfo, UserGeoInfo} from './contracts/ServerContracts';
+import {User, UserContactsInfo, UserDeviceInfo, UserGeoInfo, Stream} from './contracts/ServerContracts';
 
 
 enableProdMode();
@@ -39,19 +39,14 @@ export class MyApp {
 
        
    init() {
-        let isSignedIn = this.checkIfUserIsLoggedIn();
-        if (isSignedIn) {
+        let userId: string = JSON.parse(window.localStorage['userId'] || '{}');
+        if (userId != undefined && userId.length > 0) {
+            this.config.userId = userId;
             this.rootPage = NewsFeed;
         }
         else {
             this.rootPage = SignIn;
         }
-    }
-
-    // TODO: Move this to app.ts
-    checkIfUserIsLoggedIn() : boolean {
-        let userId: string = JSON.parse(window.localStorage['userId'] || '{}');
-        return userId != undefined && userId.length > 0; 
     }
 
     /*

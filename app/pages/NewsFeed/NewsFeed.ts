@@ -55,13 +55,25 @@ export class NewsFeed {
     }
 
     init() {
-        this.userId = JSON.parse(window.localStorage['userId']); 
-        if (this.userId == undefined || this.userId.length == 0) {
-            this.nav.push(SignIn); // TODO: Change this to setting root
-        }         
+        this.userId = this.config.userId;
         this.subscribeToNotifications();
     }
-    
+    /*
+        presentLoading() {
+           this.loading = Loading.create({
+    spinner: 'hide',
+    content: `
+      <div class="custom-spinner-container">
+        <div class="custom-spinner-box"></div>
+      </div>`,
+    duration: 5000
+  });
+    }
+
+hideLoading() {
+    this.loading.dismiss();
+}
+*/
     //#region Notifications
     subscribeToNotifications() {
         this.platform.ready().then(() => {
@@ -103,7 +115,7 @@ export class NewsFeed {
 
     fetchArticles(skip: number) {
         this.service.getNewsFeed(this.userId, skip)
-                .subscribe(articles => {this.update(articles, skip); },
+                .subscribe(posts => {this.update(posts, skip); },
                            err => {this.handleError(err)});
     }
 
@@ -118,23 +130,19 @@ export class NewsFeed {
     */
     
     update(art: PublishedPost[], skip: number) {
+        this.service.prefetchImages(art);
         this.config.printTimeElapsed();
         if (skip == 0) {
             this.articles = art.slice();
         } else {
             this.articles.concat(art.slice()); // TODO: Test
         }
+        this.skip = this.articles.length;
     }
 
     //#region Utils
     contains(array: any[], value: any): boolean {
         return Enumerable.From(array).Contains(value);
-        /*
-        for (var elem of array) {
-            if (elem === value) { return true; }
-        }
-        return false; 
-        */
     }
     //#endregion Utils
 
@@ -144,6 +152,7 @@ export class NewsFeed {
         let totalSlides = this.articles.length;
         if (totalSlides > 0 && totalSlides -slideNo < 5 )
         {
+            this.fetchArticles(this.skip);
             // fetch next set of articles
         }
     }

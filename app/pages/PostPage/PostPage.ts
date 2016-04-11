@@ -102,7 +102,7 @@ export class PostPage {
             Image: imageEntity,
             Streams: streams,
             Language: this.feedStream,
-            PostedBy: this.config.userInfo.Id,
+            PostedBy: this.config.userId,
             Tags: [],
             Date: "",
             ShouldSkip: skip

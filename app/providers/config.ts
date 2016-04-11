@@ -11,11 +11,13 @@ export class Config {
     version = "0.0.1";
     
     //#region global variables
-    state: string = 'Active';
-    userInfo: User;
-    globalTimer: number;
-    labels: Dictionary<string, string> = new Dictionary<string, string>();
+    userId: string = '';
     language: string = 'Hindi';
+    
+    state: string = 'Active';
+    globalTimer: number = 0;
+    
+    labels: Dictionary<string, string> = new Dictionary<string, string>();
     //#endregion global variables
         
     constructor(public service: ServiceCaller) {
@@ -44,11 +46,6 @@ export class Config {
     printTimeElapsed() {
         console.log("Time: " + (new Date().getTime() - this.globalTimer) + "ms");
     }
-
-    setUserInfo(user: User) {
-        this.userInfo = user;
-        this.language = user.Language;
-    }    
     
     setLabels(labels: Dictionary<string, string>) {
         this.labels = labels;

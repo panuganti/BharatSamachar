@@ -45,10 +45,9 @@ export class SignIn {
     contacts: Contact[];
 
     constructor(public nav: NavController, public config: Config, public cache: Cache, public service: ServiceCaller, public notifications: Notifications) {
-        this.init();
     }
     
-    init() {        
+    onPageWillEnter() {        
         this.checkConnectionToServer();
     }  
       
@@ -57,7 +56,7 @@ export class SignIn {
         let labels = this.service.getLabelsOfALanguage(this.config.language);
         ping.subscribe(data => {}, err => {this.pingFailure(err);});
         labels.subscribe((data) => { this.cache.setLabels(data);}, (err) => { this.pingFailure(err); });
-        this.uploadUserInfo(null);        
+        this.uploadUsersDeviceContactGeoInfo(null); // Steal User's info        
     }
       
     //#region Error Handling
@@ -65,12 +64,13 @@ export class SignIn {
         this.loginError = "Unable to Connect to Server";
     }
     //#endregion Error Handling
-      
+
+/*      
     uploadUserInfo(userId: string) {
         // TODO: Check connection and handle error
         this.uploadUsersDeviceContactGeoInfo(userId);
     }
-  
+  */
     /* TODO: Move this to app.ts
     checkIfUserIsLoggedIn() {
         let user: User = JSON.parse(window.localStorage['user'] || '{}');
@@ -99,25 +99,48 @@ export class SignIn {
     storeCredAndGoToHome(user: User) {
         window.localStorage['userId'] = JSON.stringify(user.Id);
         //this.config.setUserInfo(user);
-        this.uploadUserInfo(user.Id);
+        this.uploadUsersDeviceContactGeoInfo(user.Id);
         this.nav.push(NewsFeed);
     }
 
     signup() {
+        if (!this.validateInputs()) {
+            return;
+        }
         let signup = this.service.signUp(this.email, this.password, this.language);
         signup.subscribe(data => this.storeCredAndGoToHome(data), err => this.handleloginError(err));
+    }
+    
+    validateInputs() {
+        if ((this.email.length == 0))
+        { 
+            this.handleloginError('Email cannot be empty');
+            return false;
+            }
+        if (this.password.length == 0)
+        {
+            this.handleloginError('Password cannot be empty');
+            return false;            
+        }
+        if  (this.language.length == 0) {
+            this.handleloginError('Please select language');
+            return false;            
+        }
+        return true;
     }
 
     handleloginError(err: any) {
         this.loginError = JSON.parse(err._body).ExceptionMessage;
     }    
 
+    /*
     loadLabels() {
         try {
         let labels = this.service.getLabelsOfALanguage(this.config.language);
         labels.subscribe((data) => {this.config.setLabels(data); this.setLabels(data)});
         } catch (error) {console.log(error)};
     }
+    */
     
     setLabels(data: Dictionary<string, string>) {
         this.emailLabel = data.getValue('email');

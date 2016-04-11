@@ -22,7 +22,7 @@ export class ServiceCaller {
 
     //#region Connection 
     checkConnection() : Observable<string> {
-        return this.getRequest<string>("/config/CheckConnection/", "hello world", 1);
+        return this.getRequest<string>("/config/CheckConnection/", "hello world", 0);
     }
     //#endregion Connection 
 
@@ -161,18 +161,17 @@ export class ServiceCaller {
     
     uploadUserLocation(geoInfo: string) : Observable<boolean>{
         return this.postRequest<boolean>("/user/UpdateUserGeoInfo", geoInfo);
-    }
-    
+    }    
     //#endregion Upload UserInfo
     
     //#region private methods
-    getRequest<T>(route: string, request: string, retryCount: number = 2) : Observable<T> {
+    getRequest<T>(route: string, request: string, retryCount: number = 0) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http.get(this.apiUrl + route + request, { headers: headers }).retry(retryCount).map(res => res.json());                        
     }
     
-    postRequest<T>(route: string, jsonString: string, retryCount: number = 2) : Observable<T> {
+    postRequest<T>(route: string, jsonString: string, retryCount: number = 0) : Observable<T> {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http.post(this.apiUrl + route,

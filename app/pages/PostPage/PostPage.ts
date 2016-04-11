@@ -16,6 +16,10 @@ import 'rxjs/add/operator/retry';
 })
 
 export class PostPage {
+    userId: string = '';
+    canPost: boolean = false;
+    isAdmin: boolean = false;
+    
     state: string = "NoPreview";
     backgroundImageUrl: string = "url(\"resources/background.jpg\")";
     url: string;
@@ -49,6 +53,16 @@ export class PostPage {
     toggleImage: boolean = true;
 
     constructor(public nav: NavController, public config: Config, public service: ServiceCaller) {
+        this.init();
+    }
+
+    init() {
+        this.userId = JSON.parse(window.localStorage['userId']); 
+        if (this.userId == undefined || this.userId.length == 0) {
+            this.nav.pop(); 
+        }         
+        let user = this.service.getUserInfo(this.userId);
+        user.subscribe(data => {this.canPost = data.CanPost; this.isAdmin = data.CanPost});
     }
 
     editImageUrl() { this.toggleImage = !this.toggleImage; }

@@ -65,7 +65,6 @@ export class NewsFeed {
     //#region Notifications
     subscribeToNotifications() {
         this.platform.ready().then(() => {
-            this.config.printTimeElapsed();
             document.addEventListener("pause", this.onPause);
             document.addEventListener("resume", this.onResume);
         });
@@ -90,12 +89,10 @@ export class NewsFeed {
 
     refresh() {
         this.newsFeedError = '';
-        this.config.printTimeElapsed();
-        this.swiper.slideTo(0, 100, true);
-        let streamsOb = this.service.getStreams(this.userId);
-        streamsOb.subscribe(streams => this.fetchArticles(streams, 0), 
-                                    err => {this.handleError(err)});
         this.skip = 0;
+        //this.config.printTimeElapsed();
+        this.swiper.slideTo(0, 100, true);
+        this.fetchArticles(this.skip);
     }
     
     handleError(err: any) {
@@ -104,7 +101,7 @@ export class NewsFeed {
         this.nav.present(alert);
     }
 
-    fetchArticles(streams: Stream[], skip: number) {
+    fetchArticles(skip: number) {
         this.service.getNewsFeed(this.userId, skip)
                 .subscribe(articles => {this.update(articles, skip); },
                            err => {this.handleError(err)});

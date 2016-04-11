@@ -56,8 +56,7 @@ export class SignIn {
         let ping = this.service.checkConnection();
         let labels = this.service.getLabelsOfALanguage(this.config.language);
         ping.subscribe(data => {}, err => {this.pingFailure(err);});
-        labels.subscribe((data) => { this.cache.setLabels(data); 
-            this.config.printTimeElapsed();}, (err) => { this.pingFailure(err); });
+        labels.subscribe((data) => { this.cache.setLabels(data);}, (err) => { this.pingFailure(err); });
         this.uploadUserInfo(null);        
     }
       

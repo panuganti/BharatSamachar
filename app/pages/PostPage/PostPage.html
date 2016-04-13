@@ -2,7 +2,7 @@
 </ion-navbar>
 
 <ion-content class="has-header components-demo cards-bg social-cards postpage">
-    <div [hidden]="canPost">
+    <div *ngIf="!canPost">
         <ion-list>
             <ion-item class="item item-text-wrap">
                 <h2>In order to post, you need to invite at least one of your friend</h2> 

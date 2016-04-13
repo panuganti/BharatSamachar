@@ -29,7 +29,9 @@ export class ServiceCaller {
 
     // TODO: Move to Cache
     prefetchImages(posts: PublishedPost[]) {
-        posts.forEach(article => this.http.get(article.ImageUrl).subscribe(data => {}));
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+//        posts.forEach(article => this.http.get(article.ImageUrl, {headers: headers}).subscribe(data => {}));
     }
 
     //#region Notifications
